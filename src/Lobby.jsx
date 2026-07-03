@@ -10,11 +10,11 @@ const MENSAJES_ERROR = {
   NOMBRE_REPETIDO: "Ya hay alguien con ese nombre en la sala, usa otro.",
 };
 
-export default function Lobby({ uid, onEntrar }) {
-  const [pantalla, setPantalla] = useState("splash");
+export default function Lobby({ uid, onEntrar, codigoInicial }) {
+  const [pantalla, setPantalla] = useState(codigoInicial ? "unir" : "splash");
   const [nombre, setNombre] = useState("");
   const [shotThreshold, setShotThreshold] = useState(5);
-  const [codigoInput, setCodigoInput] = useState("");
+  const [codigoInput, setCodigoInput] = useState(codigoInicial || "");
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
 
@@ -94,7 +94,9 @@ export default function Lobby({ uid, onEntrar }) {
   if (pantalla === "unir") return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Unirme a una sala</h2>
-      <p style={{ color: "#555", fontSize: 13, margin: "0 0 20px" }}>Pide el código de 4 dígitos a quien creó la sala</p>
+      <p style={{ color: "#555", fontSize: 13, margin: "0 0 20px" }}>
+        {codigoInicial ? "Te invitaron a esta partida — solo falta tu nombre" : "Pide el código de 4 dígitos a quien creó la sala"}
+      </p>
       <input style={{ ...S.input, width: "100%", marginBottom: 12 }} placeholder="Tu nombre..." value={nombre}
         onChange={e => setNombre(e.target.value)} maxLength={12} />
       <input style={{ ...S.input, width: "100%", marginBottom: 16, fontSize: 24, letterSpacing: 6, textAlign: "center" }}

@@ -83,7 +83,14 @@ function jugadorNuevo(nombre) {
     racha: 0,
     segundosBebidos: 0,
     shotsEnviados: {},
+    visto: serverTimestamp(),
   };
+}
+
+// Firestore no tiene "onDisconnect" como Realtime Database, así que cada
+// celular avisa "sigo aquí" cada cierto tiempo mientras está en una sala.
+export async function latirPresencia(codigo, uid) {
+  await updateDoc(salaRef(codigo), { [`jugadores.${uid}.visto`]: serverTimestamp() });
 }
 
 export function escucharSala(codigo, onCambio, onError) {

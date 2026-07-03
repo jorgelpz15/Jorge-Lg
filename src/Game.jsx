@@ -1,10 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { S } from "./styles";
 import {
   iniciarEleccionDeInicio, elegirQuienEmpieza, enviarRespuesta, cambiarMano,
   avanzarRevelacion, iniciarVotacion, votar, enviarShot, cerrarShotActivo,
   siguienteRonda, terminarJuego,
 } from "./sala";
+
+const MARGEN_DESCONEXION_MS = 45000; // heartbeat cada 20s (ver App.jsx), doble de margen
+
+function estaConectado(visto, ahora) {
+  if (!visto) return true; // el timestamp del servidor todavía no llega, es un jugador recién unido
+  const ms = typeof visto.toMillis === "function" ? visto.toMillis() : 0;
+  return ahora - ms < MARGEN_DESCONEXION_MS;
+}
 
 function renderB(text, ans) {
   const hasBlank = text.includes("_");
@@ -55,9 +63,27 @@ export default function Game({ sala, uid, codigo, onSalir }) {
   const [selected, setSelected] = useState([]);
   const [mostrarRefresh, setMostrarRefresh] = useState(false);
   const [vistaShotMgr, setVistaShotMgr] = useState(false);
+  const [copiado, setCopiado] = useState(false);
+  const [ahora, setAhora] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (sala.fase !== "espera") return;
+    const t = setInterval(() => setAhora(Date.now()), 5000);
+    return () => clearInterval(t);
+  }, [sala.fase]);
 
   const yo = sala.jugadores[uid];
   const nombre = (u) => sala.jugadores[u]?.nombre || "?";
+
+  async function copiarInvitacion() {
+    const link = `${location.origin}/?codigo=${sala.codigo}`;
+    const texto = `¡Únete a mi partida de Cartas Contra la Humanidad! ${link} (código: ${sala.codigo})`;
+    try {
+      await navigator.clipboard.writeText(texto);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch { /* el navegador no dio permiso de portapapeles, no pasa nada grave */ }
+  }
 
   function toggleCard(card) {
     const n = sala.cartaNegra?.pick || 1;
@@ -89,24 +115,32 @@ export default function Game({ sala, uid, codigo, onSalir }) {
 
   // ---------- Sala de espera ----------
   if (sala.fase === "espera") {
-    const jugadores = Object.values(sala.jugadores);
-    const soyAnfitrion = uid === sala.anfitrion;
+    const entradas = Object.entries(sala.jugadores);
+    const conectados = entradas.filter(([, j]) => estaConectado(j.visto, ahora)).length;
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
         <p style={{ color: "#666", fontSize: 12, letterSpacing: 3, textTransform: "uppercase", textAlign: "center", margin: "0 0 4px" }}>Código de la sala</p>
         <div style={{ ...S.codeBox, alignSelf: "center" }}>{sala.codigo}</div>
-        <p style={{ color: "#555", fontSize: 12, textAlign: "center", margin: "0 0 24px" }}>Compártelo con tus amigos para que se unan</p>
-        <p style={{ color: "#888", fontSize: 13, margin: "0 0 8px" }}>Jugadores ({jugadores.length}/8):</p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 28 }}>
-          {jugadores.map((j, i) => <div key={i} style={S.chip}><span style={{ fontWeight: 700, fontSize: 14 }}>{j.nombre}</span></div>)}
+        <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", marginBottom: 20 }}
+          onClick={copiarInvitacion}>{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</button>
+        <p style={{ color: "#888", fontSize: 13, margin: "0 0 8px" }}>Jugadores ({conectados}/{entradas.length} conectados):</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 28 }}>
+          {entradas.map(([u, j]) => {
+            const online = estaConectado(j.visto, ahora);
+            return (
+              <div key={u} style={{ ...S.chip, justifyContent: "space-between", opacity: online ? 1 : 0.5 }}>
+                <span style={{ fontWeight: 700, fontSize: 14 }}>
+                  <span style={{ color: online ? "#4caf50" : "#666" }}>●</span> {j.nombre}
+                  {u === sala.anfitrion && " 👑"}
+                </span>
+                {!online && <span style={{ color: "#888", fontSize: 11 }}>desconectado</span>}
+              </div>
+            );
+          })}
         </div>
-        {soyAnfitrion ? (
-          <button style={{ ...S.btn, opacity: jugadores.length >= 3 ? 1 : 0.3 }} disabled={jugadores.length < 3}
-            onClick={() => iniciarEleccionDeInicio(codigo)}>¡ARMAR JUEGO! ({jugadores.length})</button>
-        ) : (
-          <p style={{ color: "#666", fontSize: 13, textAlign: "center" }}>Esperando a que el anfitrión inicie la partida…</p>
-        )}
-        {jugadores.length < 3 && <p style={{ color: "#555", fontSize: 11, textAlign: "center", marginTop: 8 }}>Se necesitan mínimo 3 jugadores</p>}
+        <button style={{ ...S.btn, opacity: entradas.length >= 3 ? 1 : 0.3 }} disabled={entradas.length < 3}
+          onClick={() => iniciarEleccionDeInicio(codigo)}>¡ARMAR JUEGO! ({entradas.length})</button>
+        {entradas.length < 3 && <p style={{ color: "#555", fontSize: 11, textAlign: "center", marginTop: 8 }}>Se necesitan mínimo 3 jugadores</p>}
       </div>
     );
   }

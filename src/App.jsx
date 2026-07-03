@@ -1,23 +1,35 @@
 import { useEffect, useState } from "react";
 import { esperarMiUid, configuracionValida } from "./firebase";
-import { escucharSala } from "./sala";
+import { escucharSala, latirPresencia } from "./sala";
 import { inyectarEstiloGlobal, S } from "./styles";
 import Lobby from "./Lobby";
 import Game from "./Game";
 
 const CLAVE_LOCAL = "cah_sesion";
+const LATIDO_MS = 20000;
+
+function leerCodigoDeUrl() {
+  const codigo = new URLSearchParams(location.search).get("codigo");
+  return codigo && /^\d{4}$/.test(codigo) ? codigo : null;
+}
 
 export default function App() {
   const [uid, setUid] = useState(null);
   const [codigo, setCodigo] = useState(null);
   const [sala, setSala] = useState(null);
   const [errorSala, setErrorSala] = useState(null);
+  const [codigoInicial] = useState(leerCodigoDeUrl);
 
   useEffect(() => {
     inyectarEstiloGlobal();
     if (!configuracionValida) return;
     esperarMiUid().then((u) => {
       setUid(u);
+      // Un link de invitación (?codigo=1234) manda sobre una sesión guardada vieja.
+      if (codigoInicial) {
+        history.replaceState(null, "", location.pathname);
+        return;
+      }
       const guardado = localStorage.getItem(CLAVE_LOCAL);
       if (guardado) {
         try {
@@ -46,6 +58,14 @@ export default function App() {
     );
     return unsub;
   }, [codigo, uid]);
+
+  // Avisa "sigo aquí" cada 20s mientras el celular está dentro de una sala,
+  // para que los demás vean quién sigue conectado en la sala de espera.
+  useEffect(() => {
+    if (!codigo || !uid || !sala) return;
+    const t = setInterval(() => latirPresencia(codigo, uid), LATIDO_MS);
+    return () => clearInterval(t);
+  }, [codigo, uid, sala != null]);
 
   function handleEntrar(codigoNuevo) {
     localStorage.setItem(CLAVE_LOCAL, JSON.stringify({ codigo: codigoNuevo }));
@@ -82,7 +102,7 @@ export default function App() {
   }
 
   if (!codigo) {
-    return <Lobby uid={uid} onEntrar={handleEntrar} />;
+    return <Lobby uid={uid} onEntrar={handleEntrar} codigoInicial={codigoInicial} />;
   }
 
   if (!sala) {
