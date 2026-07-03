@@ -1,0 +1,15 @@
+rules_version = '2';
+
+// Reglas simples pensadas para un juego casual entre amigos: cualquiera que
+// entre a la página (que se autentica de forma anónima automáticamente) y
+// conozca el código de 4 dígitos de la sala puede leer y escribir esa sala.
+// No hay datos sensibles en juego (nombres y cartas de un juego de fiesta),
+// así que se prioriza simplicidad sobre reglas finas por jugador.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /salas/{codigo} {
+      allow read, write: if request.auth != null
+                          && codigo.matches('^[0-9]{4}$');
+    }
+  }
+}
