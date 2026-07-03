@@ -2,7 +2,7 @@
 // votar, repartir shots... Cada función escribe en Firestore y todos los
 // celulares conectados reciben el cambio vía onSnapshot (ver escucharSala).
 import {
-  doc, getDoc, setDoc, updateDoc, onSnapshot, runTransaction, serverTimestamp,
+  doc, getDoc, setDoc, updateDoc, onSnapshot, runTransaction, serverTimestamp, deleteField,
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { WHITE_CARDS, BLACK_CARDS, STARTER_CHALLENGES, getPunishment, shuffle } from "./gameData";
@@ -69,6 +69,27 @@ export async function unirseSala(codigo, nombre, uid) {
     tx.update(ref, { [`jugadores.${uid}`]: jugadorNuevo(nombre) });
   });
   return codigo;
+}
+
+// Solo se puede quitar limpiamente a alguien de la sala mientras se está en
+// la sala de espera (antes de repartir cartas). Con el juego ya empezado no
+// hay una forma segura de sacarlo sin romper el orden/las respuestas de la
+// ronda en curso, así que ahí el jugador solo cierra su propia sesión local
+// (ver onSalir en App.jsx) y puede volver a entrar con el mismo código.
+export async function salirDeSalaEnEspera(codigo, uid) {
+  const ref = salaRef(codigo);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists()) return;
+    const sala = snap.data();
+    if (sala.fase !== "espera") return;
+    const cambios = { [`jugadores.${uid}`]: deleteField() };
+    if (sala.anfitrion === uid) {
+      const restante = Object.keys(sala.jugadores).find((u) => u !== uid);
+      if (restante) cambios.anfitrion = restante;
+    }
+    tx.update(ref, cambios);
+  });
 }
 
 function jugadorNuevo(nombre) {

@@ -3,7 +3,7 @@ import { S } from "./styles";
 import {
   iniciarEleccionDeInicio, elegirQuienEmpieza, enviarRespuesta, cambiarMano,
   avanzarRevelacion, iniciarVotacion, votar, enviarShot, cerrarShotActivo,
-  siguienteRonda, terminarJuego,
+  siguienteRonda, terminarJuego, salirDeSalaEnEspera,
 } from "./sala";
 
 const MARGEN_DESCONEXION_MS = 45000; // heartbeat cada 20s (ver App.jsx), doble de margen
@@ -65,6 +65,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
   const [vistaShotMgr, setVistaShotMgr] = useState(false);
   const [copiado, setCopiado] = useState(false);
   const [ahora, setAhora] = useState(() => Date.now());
+  const [confirmarSalida, setConfirmarSalida] = useState(false);
 
   useEffect(() => {
     if (sala.fase !== "espera") return;
@@ -85,6 +86,18 @@ export default function Game({ sala, uid, codigo, onSalir }) {
     } catch { /* el navegador no dio permiso de portapapeles, no pasa nada grave */ }
   }
 
+  async function confirmarSalir() {
+    if (sala.fase === "espera") await salirDeSalaEnEspera(codigo, uid);
+    onSalir();
+  }
+
+  function BotonSalir() {
+    return (
+      <button style={{ background: "none", border: "none", color: "#555", fontSize: 12, textDecoration: "underline", cursor: "pointer", marginTop: 18 }}
+        onClick={() => setConfirmarSalida(true)}>Salir de la sala</button>
+    );
+  }
+
   function toggleCard(card) {
     const n = sala.cartaNegra?.pick || 1;
     if (selected.includes(card)) setSelected(selected.filter((c) => c !== card));
@@ -95,6 +108,28 @@ export default function Game({ sala, uid, codigo, onSalir }) {
     const cartas = selected;
     setSelected([]);
     await enviarRespuesta(codigo, uid, cartas);
+  }
+
+  // ---------- Confirmación de salida ----------
+  if (confirmarSalida) {
+    const enEspera = sala.fase === "espera";
+    return (
+      <div style={S.page}>
+        <div style={S.card}>
+          <div style={{ fontSize: 44, marginBottom: 8 }}>🚪</div>
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#fff", margin: "0 0 10px" }}>¿Salir de la sala?</h2>
+          <p style={{ color: "#999", fontSize: 13, lineHeight: 1.5, margin: "0 0 20px" }}>
+            {enEspera
+              ? "Puedes volver a entrar después con el mismo código."
+              : "La partida ya empezó — si sales ahora, el juego puede quedarse esperando tu jugada hasta que vuelvas a entrar con el código."}
+          </p>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button style={{ ...S.btnSm, flex: 1, background: "#333", color: "#aaa" }} onClick={() => setConfirmarSalida(false)}>Seguir jugando</button>
+            <button style={{ ...S.btnSm, flex: 1, background: "#ff4444", color: "#fff" }} onClick={confirmarSalir}>Sí, salir</button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // ---------- Overlay de shot compartido (todos lo ven) ----------
@@ -141,6 +176,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
         <button style={{ ...S.btn, opacity: entradas.length >= 3 ? 1 : 0.3 }} disabled={entradas.length < 3}
           onClick={() => iniciarEleccionDeInicio(codigo)}>¡ARMAR JUEGO! ({entradas.length})</button>
         {entradas.length < 3 && <p style={{ color: "#555", fontSize: 11, textAlign: "center", marginTop: 8 }}>Se necesitan mínimo 3 jugadores</p>}
+        <div style={{ textAlign: "center" }}><BotonSalir /></div>
       </div>
     );
   }
@@ -156,6 +192,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
           <p style={{ fontSize: 22, fontWeight: 900, color: "#ffd700", lineHeight: 1.3, margin: "0 0 20px" }}>{sala.retoInicial}</p>
           <p style={{ color: "#666", fontSize: 12, margin: "0 0 16px" }}>Si esto te describe a ti, toca el botón</p>
           <button style={S.btnGold} onClick={() => elegirQuienEmpieza(codigo, uid)}>¡SOY YO, EMPIEZO!</button>
+          <BotonSalir />
         </div>
       </div>
     );
@@ -180,6 +217,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
                 <span key={u} style={{ ...S.chip, opacity: sala.respuestas[u] ? 1 : 0.35 }}>{nombre(u)} {sala.respuestas[u] ? "✓" : "…"}</span>
               ))}
             </div>
+            <BotonSalir />
           </div>
         </div>
       );
@@ -273,6 +311,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
             <div style={{ fontSize: 44, marginBottom: 8 }}>🗳️</div>
             <h2 style={{ fontSize: 18, fontWeight: 800, color: "#4caf50", margin: "0 0 10px" }}>Voto enviado, esperando a los demás…</h2>
             <p style={{ color: "#888", fontSize: 12 }}>{votaron} de {sala.orden.length} ya votaron</p>
+            <BotonSalir />
           </div>
         </div>
       );
@@ -386,6 +425,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
           <button style={{ ...S.btn, flex: 1 }} onClick={() => siguienteRonda(codigo)}>Siguiente Ronda →</button>
           <button style={{ ...S.btnSm, background: "#1a0000", color: "#ff4444", border: "1px solid #ff4444", padding: "14px 12px" }} onClick={() => terminarJuego(codigo)}>FIN</button>
         </div>
+        <div style={{ textAlign: "center" }}><BotonSalir /></div>
       </div>
     );
   }
