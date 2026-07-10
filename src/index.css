@@ -10,11 +10,22 @@ body {
 }
 
 input::placeholder {
-  color: #555;
+  color: #7a7a7a;
+}
+
+input:focus {
+  border-color: #ffd700 !important;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
 }
 
 button:active {
   transform: scale(0.97);
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #ffd700;
+  outline-offset: 2px;
 }
 
 ::-webkit-scrollbar {
@@ -28,4 +39,16 @@ button:active {
 ::-webkit-scrollbar-thumb {
   background: #333;
   border-radius: 2px;
+}
+
+/* El juego usa transiciones cortas (selección de carta, presionar botón).
+   Quien pida menos movimiento las recibe casi instantáneas, sin animar. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+  button:active {
+    transform: none;
+  }
 }

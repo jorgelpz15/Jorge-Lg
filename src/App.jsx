@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { esperarMiUid, configuracionValida } from "./firebase";
 import { escucharSala, latirPresencia } from "./sala";
-import { inyectarEstiloGlobal, S } from "./styles";
+import { S } from "./styles";
 import Lobby from "./Lobby";
 import Game from "./Game";
 
@@ -21,7 +21,6 @@ export default function App() {
   const [codigoInicial] = useState(leerCodigoDeUrl);
 
   useEffect(() => {
-    inyectarEstiloGlobal();
     if (!configuracionValida) return;
     esperarMiUid().then((u) => {
       setUid(u);
@@ -96,7 +95,7 @@ export default function App() {
   if (!uid) {
     return (
       <div style={S.page}>
-        <p style={{ color: "#666", fontSize: 13 }}>Cargando…</p>
+        <p style={{ color: "#7a7a7a", fontSize: 13 }}>Cargando…</p>
       </div>
     );
   }
@@ -108,7 +107,7 @@ export default function App() {
   if (!sala) {
     return (
       <div style={S.page}>
-        <p style={{ color: "#666", fontSize: 13 }}>Entrando a la sala…</p>
+        <p style={{ color: "#7a7a7a", fontSize: 13 }}>Entrando a la sala…</p>
       </div>
     );
   }

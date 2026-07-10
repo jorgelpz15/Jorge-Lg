@@ -73,8 +73,8 @@
       "kind": "input",
       "refersTo": "input-field",
       "description": "Nombre de jugador, código de sala de 4 dígitos.",
-      "html": "<input class=\"ds-input\" placeholder=\"Tu nombre...\" />",
-      "css": ".ds-input { background: #1a1a1a; border: 2px solid #333; border-radius: 10px; padding: 13px 14px; font-size: 15px; color: #fff; outline: none; transition: box-shadow 0.15s, border-color 0.15s; } .ds-input::placeholder { color: #555; } .ds-input:focus { border-color: #ffd700; box-shadow: 0 0 0 3px rgba(255,215,0,0.2); }"
+      "html": "<label class=\"ds-label\" for=\"ds-demo-input\">Tu nombre</label><input id=\"ds-demo-input\" class=\"ds-input\" placeholder=\"Ej. Jorge\" />",
+      "css": ".ds-label { display: block; color: #888; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 6px; } .ds-input { background: #1a1a1a; border: 2px solid #333; border-radius: 10px; padding: 13px 14px; font-size: 15px; color: #fff; outline: none; transition: box-shadow 0.15s, border-color 0.15s; } .ds-input::placeholder { color: #7a7a7a; } .ds-input:focus { border-color: #ffd700; box-shadow: 0 0 0 3px rgba(255,215,0,0.2); }"
     },
     {
       "name": "Tarjeta de Contenido",
@@ -106,7 +106,9 @@
       "Do aplicar el Resplandor Ambiental (sombra difusa, sin esquina dura) a toda superficie de Carbón o más clara que flote sobre el fondo",
       "Do mantener toda la interfaz en una sola familia tipográfica (Helvetica Neue), variando peso/tamaño/letter-spacing para jerarquía",
       "Do dar siempre una salida visible en pantallas de espera (no dejar a nadie atorado)",
-      "Do dar movimiento y personalidad a selección de cartas, revelaciones y victorias, siempre con alternativa para prefers-reduced-motion"
+      "Do dar movimiento y personalidad a selección de cartas, revelaciones y victorias, siempre con alternativa para prefers-reduced-motion",
+      "Do usar Texto Terciario (#7a7a7a) como el gris más oscuro permitido para cualquier texto que el jugador necesite leer",
+      "Do poner un label visible sobre cada input, nunca depender solo del placeholder"
     ],
     "donts": [
       "Don't usar tarjetas grises intercambiables ni la estética de dashboard SaaS/corporativo",

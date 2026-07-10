@@ -12,9 +12,7 @@ colors:
   blanco-carta: "#ffffff"
   texto-principal: "#ffffff"
   texto-secundario: "#888888"
-  texto-terciario: "#666666"
-  texto-apagado: "#555555"
-  texto-fantasma: "#444444"
+  texto-terciario: "#7a7a7a"
   verde-confirmado: "#4caf50"
   rojo-alarma: "#ff4444"
   ambar-tequila: "#ff8800"
@@ -134,7 +132,7 @@ para retroalimentación del juego, nunca decorativos.
 - **Grafito** (#1a1a1a): segunda superficie elevada — inputs, botones fantasma, chips de nombres de jugador.
 - **Borde Grafito** (#333333) / **Borde Carbón** (#222222): únicos bordes permitidos; nunca un borde de color salvo dorado o rojo de alarma.
 - **Blanco Carta** (#ffffff): el color de las cartas blancas físicas y del texto sobre superficies claras.
-- **Texto Principal** (#ffffff), **Texto Secundario** (#888888), **Texto Terciario** (#666666), **Texto Apagado** (#555555), **Texto Fantasma** (#444444): escala de legibilidad de 5 pasos — a mayor jerarquía, más blanco.
+- **Texto Principal** (#ffffff), **Texto Secundario** (#888888), **Texto Terciario** (#7a7a7a): escala de legibilidad de 3 pasos, las tres validadas en ≥4.5:1 de contraste sobre Negro Medianoche — a mayor jerarquía, más blanco. (La versión original tenía 5 pasos con tonos hasta #444444; se consolidó a 3 en la pasada de `/impeccable polish` porque los dos tonos más oscuros no pasaban el contraste mínimo para texto informativo real.)
 
 ### Named Rules
 **La Regla del Oro Escaso.** El dorado es el único acento de marca en todo el sistema. Si una pantalla necesita un segundo color para llamar la atención, es una señal de que la jerarquía está mal resuelta — no se agrega un segundo acento, se ajusta el tamaño o el peso.
@@ -215,6 +213,8 @@ en "Ronda Dorada".
 - **Do** mantener toda la interfaz en una sola familia tipográfica (Helvetica Neue), variando peso/tamaño/letter-spacing para jerarquía.
 - **Do** dar siempre una salida visible en pantallas de espera (no dejar a nadie "atorado" — botón de salir, reconexión por código).
 - **Do** dar movimiento y personalidad a selección de cartas, revelaciones y victorias — el juego debe sentirse vivo, no una pantalla quieta. Siempre con alternativa para `prefers-reduced-motion`.
+- **Do** usar Texto Terciario (#7a7a7a) como el gris más oscuro permitido para cualquier texto que el jugador necesite leer — es el piso de contraste real (≥4.5:1), no un mínimo aspiracional.
+- **Do** poner un `<label>` visible sobre cada input, nunca depender solo del placeholder para explicar qué va ahí.
 
 ### Don't:
 - **Don't** usar tarjetas grises intercambiables ni la estética de dashboard SaaS/corporativo — este es un juego de fiesta para adultos, no una herramienta de productividad.

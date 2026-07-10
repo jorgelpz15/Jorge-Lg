@@ -50,13 +50,13 @@ export default function Lobby({ uid, onEntrar, codigoInicial }) {
       <div style={{ textAlign: "center", maxWidth: 380 }}>
         <div style={{ fontSize: 72, marginBottom: 8 }}>🍆</div>
         <h1 style={{ fontSize: 36, fontWeight: 900, color: "#fff", margin: 0, letterSpacing: 3, lineHeight: 1.1 }}>CARTAS</h1>
-        <p style={{ color: "#666", fontSize: 15, letterSpacing: 6, margin: "2px 0", textTransform: "uppercase", fontWeight: 300 }}>contra la</p>
+        <p style={{ color: "#7a7a7a", fontSize: 15, letterSpacing: 6, margin: "2px 0", textTransform: "uppercase", fontWeight: 300 }}>contra la</p>
         <h1 style={{ fontSize: 36, fontWeight: 900, color: "#fff", margin: 0, letterSpacing: 3 }}>HUMANIDAD</h1>
         <p style={{ color: "#ffd700", fontSize: 13, marginTop: 12, letterSpacing: 2 }}>Edición México 🇲🇽 · Multijugador</p>
-        <p style={{ color: "#555", fontSize: 11, marginTop: 4 }}>{WHITE_CARDS.length} blancas · {BLACK_CARDS.length} negras</p>
+        <p style={{ color: "#7a7a7a", fontSize: 11, marginTop: 4 }}>{WHITE_CARDS.length} blancas · {BLACK_CARDS.length} negras</p>
         <div style={{ width: 50, height: 2, background: "#222", margin: "28px auto" }} />
         <button style={S.btn} onClick={() => setPantalla("home")}>JUGAR</button>
-        <p style={{ color: "#444", fontSize: 11, marginTop: 20, fontStyle: "italic" }}>Un juego horrible para gente horrible</p>
+        <p style={{ color: "#7a7a7a", fontSize: 11, marginTop: 20, fontStyle: "italic" }}>Un juego horrible para gente horrible</p>
       </div>
     </div>
   );
@@ -74,8 +74,9 @@ export default function Lobby({ uid, onEntrar, codigoInicial }) {
   if (pantalla === "crear") return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Crear sala</h2>
-      <p style={{ color: "#555", fontSize: 13, margin: "0 0 20px" }}>Tú serás el anfitrión de la partida</p>
-      <input style={{ ...S.input, width: "100%", marginBottom: 16 }} placeholder="Tu nombre..." value={nombre}
+      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>Tú serás el anfitrión de la partida</p>
+      <label style={S.fieldLabel} htmlFor="nombre-crear">Tu nombre</label>
+      <input id="nombre-crear" style={{ ...S.input, width: "100%", marginBottom: 16 }} placeholder="Ej. Jorge" value={nombre}
         onChange={e => setNombre(e.target.value)} maxLength={12} />
       <div style={{ marginBottom: 24 }}>
         <p style={{ color: "#888", fontSize: 13, margin: "0 0 8px" }}>🍺 Estrellas para desbloquear un shot:</p>
@@ -94,12 +95,14 @@ export default function Lobby({ uid, onEntrar, codigoInicial }) {
   if (pantalla === "unir") return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Unirme a una sala</h2>
-      <p style={{ color: "#555", fontSize: 13, margin: "0 0 20px" }}>
+      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>
         {codigoInicial ? "Te invitaron a esta partida — solo falta tu nombre" : "Pide el código de 4 dígitos a quien creó la sala"}
       </p>
-      <input style={{ ...S.input, width: "100%", marginBottom: 12 }} placeholder="Tu nombre..." value={nombre}
+      <label style={S.fieldLabel} htmlFor="nombre-unir">Tu nombre</label>
+      <input id="nombre-unir" style={{ ...S.input, width: "100%", marginBottom: 12 }} placeholder="Ej. Jorge" value={nombre}
         onChange={e => setNombre(e.target.value)} maxLength={12} />
-      <input style={{ ...S.input, width: "100%", marginBottom: 16, fontSize: 24, letterSpacing: 6, textAlign: "center" }}
+      <label style={S.fieldLabel} htmlFor="codigo-unir">Código de la sala</label>
+      <input id="codigo-unir" style={{ ...S.input, width: "100%", marginBottom: 16, fontSize: 24, letterSpacing: 6, textAlign: "center" }}
         placeholder="0000" value={codigoInput} inputMode="numeric" maxLength={4}
         onChange={e => setCodigoInput(e.target.value.replace(/\D/g, "").slice(0, 4))} />
       {error && <p style={S.errorBox}>{error}</p>}
