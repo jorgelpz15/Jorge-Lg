@@ -252,7 +252,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
               const sel = selected.includes(card);
               const si = selected.indexOf(card);
               return (
-                <button key={i} style={{ background: sel ? "#ffd700" : "#fff", border: "none", borderRadius: 10, padding: "12px 14px", textAlign: "left", cursor: "pointer", position: "relative", display: "block", width: "100%", transform: sel ? "scale(0.97)" : "none", boxShadow: sel ? "0 0 0 3px rgba(255,215,0,0.3)" : "none" }} onClick={() => toggleCard(card)}>
+                <button key={i} style={{ background: sel ? "#ffd700" : "#fff", border: "none", borderRadius: 10, padding: "12px 14px", textAlign: "left", cursor: "pointer", position: "relative", display: "block", width: "100%", transform: sel ? "scale(0.97)" : "none", boxShadow: sel ? "0 0 0 3px rgba(255,215,0,0.3), 0 0 20px rgba(255,215,0,0.35)" : "0 8px 20px rgba(0,0,0,0.35)" }} onClick={() => toggleCard(card)}>
                   {sel && <span style={{ position: "absolute", top: -5, right: -3, background: "#000", color: "#ffd700", width: 20, height: 20, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900 }}>{si + 1}</span>}
                   <span style={{ color: "#000", fontSize: 14, fontWeight: 700, lineHeight: 1.3 }}>{card}</span>
                 </button>
