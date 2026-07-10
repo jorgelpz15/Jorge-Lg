@@ -57,6 +57,7 @@ export default function Lobby({ uid, onEntrar, codigoInicial }) {
         <div style={{ width: 50, height: 2, background: "#222", margin: "28px auto" }} />
         <button style={S.btn} onClick={() => setPantalla("home")}>JUGAR</button>
         <p style={{ color: "#7a7a7a", fontSize: 11, marginTop: 20, fontStyle: "italic" }}>Un juego horrible para gente horrible</p>
+        <p style={{ color: "#7a7a7a", fontSize: 10, marginTop: 10 }}>v{__APP_VERSION__}</p>
       </div>
     </div>
   );

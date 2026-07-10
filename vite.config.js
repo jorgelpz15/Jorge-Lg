@@ -6,4 +6,8 @@ export default defineConfig({
   resolve: {
     preserveSymlinks: true,
   },
+  define: {
+    // Para saber de un vistazo si el celular ya cargó la última versión.
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version || "0.0.0"),
+  },
 })
