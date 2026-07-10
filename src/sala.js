@@ -164,6 +164,10 @@ export async function elegirQuienEmpieza(codigo, uidElegido) {
       ronda: 1,
       respuestas: {},
       fase: "jugando",
+      // Con exactamente 2 jugadores no hay votación real posible (el único
+      // voto disponible sería siempre para el otro), así que el juego pasa
+      // a "modo libre": solo se revela y se ríe, sin puntos ni votos.
+      modoLibre: orden.length === 2,
     });
   });
 }
@@ -245,6 +249,26 @@ export async function iniciarVotacion(codigo) {
     const sala = snap.data();
     if (sala.fase !== "revelando") return;
     tx.update(ref, { fase: "votando", votos: {} });
+  });
+}
+
+// Modo libre (2 jugadores): de la revelación se salta directo a una carta
+// nueva, sin pasar por votación, puntaje, shots ni castigos.
+export async function otraRondaLibre(codigo) {
+  const ref = salaRef(codigo);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    const sala = snap.data();
+    if (sala.fase !== "revelando" || !sala.modoLibre) return;
+    let mazoNegro = sala.mazoNegro;
+    if (!mazoNegro.length) mazoNegro = shuffle(BLACK_CARDS);
+    tx.update(ref, {
+      mazoNegro: mazoNegro.slice(1),
+      cartaNegra: mazoNegro[0],
+      ronda: sala.ronda + 1,
+      respuestas: {},
+      fase: "jugando",
+    });
   });
 }
 

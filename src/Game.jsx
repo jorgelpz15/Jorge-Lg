@@ -3,7 +3,7 @@ import { S } from "./styles";
 import {
   iniciarEleccionDeInicio, elegirQuienEmpieza, enviarRespuesta, cambiarMano,
   avanzarRevelacion, iniciarVotacion, votar, enviarShot, cerrarShotActivo,
-  siguienteRonda, terminarJuego, salirDeSalaEnEspera,
+  siguienteRonda, terminarJuego, salirDeSalaEnEspera, otraRondaLibre,
 } from "./sala";
 
 const MARGEN_DESCONEXION_MS = 45000; // heartbeat cada 20s (ver App.jsx), doble de margen
@@ -178,9 +178,10 @@ export default function Game({ sala, uid, codigo, onSalir }) {
             );
           })}
         </div>
-        <button style={{ ...S.btn, opacity: entradas.length >= 3 ? 1 : 0.3 }} disabled={entradas.length < 3}
+        <button style={{ ...S.btn, opacity: entradas.length >= 2 ? 1 : 0.3 }} disabled={entradas.length < 2}
           onClick={() => iniciarEleccionDeInicio(codigo)}>¡ARMAR JUEGO! ({entradas.length})</button>
-        {entradas.length < 3 && <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", marginTop: 8 }}>Se necesitan mínimo 3 jugadores</p>}
+        {entradas.length < 2 && <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", marginTop: 8 }}>Se necesitan mínimo 2 jugadores</p>}
+        {entradas.length === 2 && <p style={{ color: "#ffd700", fontSize: 11, textAlign: "center", marginTop: 8 }}>🎲 Modo libre: solo para reír, sin puntos ni votos</p>}
         <div style={{ textAlign: "center" }}><BotonSalir /></div>
       </div>
     );
@@ -235,7 +236,9 @@ export default function Game({ sala, uid, codigo, onSalir }) {
             <span style={{ background: sala.esRondaDorada ? "#ffd700" : "#222", color: sala.esRondaDorada ? "#000" : "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>R{sala.ronda}{sala.esRondaDorada ? " ×2" : ""}</span>
             <span style={{ fontSize: 16, fontWeight: 900, color: "#fff" }}>{yo.nombre}</span>
           </div>
-          <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>⭐{yo.estrellas || 0}</span>
+          {sala.modoLibre
+            ? <span style={{ fontSize: 11, color: "#ffd700", fontWeight: 700 }}>🎲 Libre</span>
+            : <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>⭐{yo.estrellas || 0}</span>}
         </div>
         <div style={{ background: sala.esRondaDorada ? "linear-gradient(135deg,#1a1500,#000)" : "#000", margin: "10px 14px", padding: "18px 16px", borderRadius: 14, border: sala.esRondaDorada ? "2px solid #ffd700" : "2px solid #333", position: "relative" }}>
           <p style={{ color: "#fff", fontSize: 18, fontWeight: 700, lineHeight: 1.4, margin: 0 }}>{renderB(sala.cartaNegra.text)}</p>
@@ -299,8 +302,11 @@ export default function Game({ sala, uid, codigo, onSalir }) {
           <button style={{ ...S.navBtn, opacity: sala.revIdx > 0 ? 1 : 0.3 }} disabled={sala.revIdx === 0} onClick={() => avanzarRevelacion(codigo, sala.revIdx - 1)}>← Anterior</button>
           {sala.revIdx < sala.revSubs.length - 1
             ? <button style={S.navBtn} onClick={() => avanzarRevelacion(codigo, sala.revIdx + 1)}>Siguiente →</button>
-            : <button style={S.btnGold} onClick={() => iniciarVotacion(codigo)}>¡A VOTAR!</button>}
+            : sala.modoLibre
+              ? <button style={S.btnGold} onClick={() => otraRondaLibre(codigo)}>Otra ronda 😂</button>
+              : <button style={S.btnGold} onClick={() => iniciarVotacion(codigo)}>¡A VOTAR!</button>}
         </div>
+        <div style={{ textAlign: "center" }}><BotonSalir /></div>
       </div>
     );
   }
