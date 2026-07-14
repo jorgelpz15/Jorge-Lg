@@ -5,7 +5,8 @@ import {
   doc, getDoc, setDoc, updateDoc, onSnapshot, runTransaction, serverTimestamp, deleteField,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { WHITE_CARDS, BLACK_CARDS, STARTER_CHALLENGES, getPunishment, shuffle } from "./gameData";
+import { shuffle } from "./gameData";
+import { mazosPara } from "./idiomas";
 
 const MANO_INICIAL = 10;
 
@@ -17,7 +18,7 @@ function generarCodigo() {
   return String(Math.floor(1000 + Math.random() * 9000));
 }
 
-export async function crearSala(nombre, shotsParaDesbloquear, uid) {
+export async function crearSala(nombre, shotsParaDesbloquear, uid, idioma) {
   let codigo;
   // Reintenta si por mala suerte el código ya existe.
   for (let intento = 0; intento < 5; intento++) {
@@ -30,6 +31,7 @@ export async function crearSala(nombre, shotsParaDesbloquear, uid) {
     creadaEn: serverTimestamp(),
     fase: "espera",
     anfitrion: uid,
+    idioma: idioma === "en" ? "en" : "es",
     config: { shotsParaDesbloquear },
     jugadores: {
       [uid]: jugadorNuevo(nombre),
@@ -125,7 +127,9 @@ export function escucharSala(codigo, onCambio, onError) {
 // -------------------- Empezar el juego --------------------
 
 export async function iniciarEleccionDeInicio(codigo) {
-  const reto = STARTER_CHALLENGES[Math.floor(Math.random() * STARTER_CHALLENGES.length)];
+  const snap = await getDoc(salaRef(codigo));
+  const { STARTERS } = mazosPara(snap.data()?.idioma);
+  const reto = STARTERS[Math.floor(Math.random() * STARTERS.length)];
   await updateDoc(salaRef(codigo), { fase: "inicio", retoInicial: reto });
 }
 
@@ -138,11 +142,12 @@ export async function elegirQuienEmpieza(codigo, uidElegido) {
     const sala = snap.data();
     if (sala.fase !== "inicio") return;
 
+    const { WHITE, BLACK } = mazosPara(sala.idioma);
     const uids = Object.keys(sala.jugadores);
     const i = uids.indexOf(uidElegido);
     const orden = [...uids.slice(i), ...uids.slice(0, i)];
-    const mazoBlanco = shuffle(WHITE_CARDS);
-    const mazoNegro = shuffle(BLACK_CARDS);
+    const mazoBlanco = shuffle(WHITE);
+    const mazoNegro = shuffle(BLACK);
 
     const jugadoresActualizados = {};
     let cursor = 0;
@@ -174,10 +179,10 @@ export async function elegirQuienEmpieza(codigo, uidElegido) {
 
 // -------------------- Turno de juego --------------------
 
-function reponerMazoBlanco(mazoBlanco, necesarias, cartasEnUso) {
+function reponerMazoBlanco(mazoBlanco, necesarias, cartasEnUso, poolCompleto) {
   if (mazoBlanco.length >= necesarias) return mazoBlanco;
   const enUso = new Set(cartasEnUso);
-  const disponibles = WHITE_CARDS.filter((c) => !enUso.has(c));
+  const disponibles = poolCompleto.filter((c) => !enUso.has(c));
   return [...mazoBlanco, ...shuffle(disponibles)];
 }
 
@@ -189,6 +194,7 @@ export async function enviarRespuesta(codigo, uid, cartas) {
     if (sala.fase !== "jugando") return;
     if (sala.respuestas[uid]) return; // ya había enviado
 
+    const { WHITE } = mazosPara(sala.idioma);
     const pick = sala.cartaNegra.pick;
     const jugador = sala.jugadores[uid];
     const manoRestante = jugador.mano.filter((c) => !cartas.includes(c));
@@ -198,7 +204,7 @@ export async function enviarRespuesta(codigo, uid, cartas) {
       ...Object.values(sala.respuestas).flat(),
       cartas,
     ].flat();
-    const mazoBlanco = reponerMazoBlanco(sala.mazoBlanco, pick, cartasEnUso);
+    const mazoBlanco = reponerMazoBlanco(sala.mazoBlanco, pick, cartasEnUso, WHITE);
     const robadas = mazoBlanco.slice(0, pick);
 
     const respuestas = { ...sala.respuestas, [uid]: cartas };
@@ -261,7 +267,7 @@ export async function otraRondaLibre(codigo) {
     const sala = snap.data();
     if (sala.fase !== "revelando" || !sala.modoLibre) return;
     let mazoNegro = sala.mazoNegro;
-    if (!mazoNegro.length) mazoNegro = shuffle(BLACK_CARDS);
+    if (!mazoNegro.length) mazoNegro = shuffle(mazosPara(sala.idioma).BLACK);
     tx.update(ref, {
       mazoNegro: mazoNegro.slice(1),
       cartaNegra: mazoNegro[0],
@@ -337,7 +343,7 @@ function calcularResultadoRonda(sala, votos) {
   let ultimaRonda = { tabla, ganadores, castigoQuien: null, castigoTexto: null };
   if (min === 0 && perdedores.length > 0 && perdedores.length < sala.orden.length) {
     const infortunado = perdedores[Math.floor(Math.random() * perdedores.length)];
-    const p = getPunishment(sala.ronda);
+    const p = mazosPara(sala.idioma).getPunishment(sala.ronda);
     jugadores[infortunado].segundosBebidos = (jugadores[infortunado].segundosBebidos || 0) + p.secs;
     ultimaRonda.castigoQuien = infortunado;
     ultimaRonda.castigoTexto = p.text;
@@ -373,7 +379,7 @@ export async function siguienteRonda(codigo) {
     const sala = snap.data();
     if (sala.fase !== "resultados") return;
     let mazoNegro = sala.mazoNegro;
-    if (!mazoNegro.length) mazoNegro = shuffle(BLACK_CARDS);
+    if (!mazoNegro.length) mazoNegro = shuffle(mazosPara(sala.idioma).BLACK);
     const ronda = sala.ronda + 1;
     tx.update(ref, {
       mazoNegro: mazoNegro.slice(1),

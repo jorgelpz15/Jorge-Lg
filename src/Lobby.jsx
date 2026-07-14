@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { S } from "./styles";
 import { WHITE_CARDS, BLACK_CARDS } from "./gameData";
+import { WHITE_CARDS_EN, BLACK_CARDS_EN } from "./gameDataEn";
 import { crearSala, unirseSala } from "./sala";
 
 const MENSAJES_ERROR = {
@@ -14,6 +15,7 @@ export default function Lobby({ uid, onEntrar, codigoInicial }) {
   const [pantalla, setPantalla] = useState(codigoInicial ? "unir" : "splash");
   const [nombre, setNombre] = useState("");
   const [shotThreshold, setShotThreshold] = useState(5);
+  const [idioma, setIdioma] = useState("es");
   const [codigoInput, setCodigoInput] = useState(codigoInicial || "");
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
@@ -23,7 +25,7 @@ export default function Lobby({ uid, onEntrar, codigoInicial }) {
     setCargando(true);
     setError("");
     try {
-      const codigo = await crearSala(nombre, shotThreshold, uid);
+      const codigo = await crearSala(nombre, shotThreshold, uid, idioma);
       onEntrar(codigo, nombre.trim());
     } catch (e) {
       setError("No se pudo crear la sala. Intenta de nuevo.");
@@ -79,6 +81,16 @@ export default function Lobby({ uid, onEntrar, codigoInicial }) {
       <label style={S.fieldLabel} htmlFor="nombre-crear">Tu nombre</label>
       <input id="nombre-crear" style={{ ...S.input, width: "100%", marginBottom: 16 }} placeholder="Ej. Jorge" value={nombre}
         onChange={e => setNombre(e.target.value)} maxLength={12} />
+      <div style={{ marginBottom: 20 }}>
+        <p style={{ color: "#888", fontSize: 13, margin: "0 0 8px" }}>🗣️ Idioma de las cartas:</p>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button style={{ ...S.nameBtn, flex: 1, ...(idioma === "es" ? { background: "#ffd700", color: "#000", border: "1px solid #ffd700" } : {}) }}
+            onClick={() => setIdioma("es")}>🇲🇽 Español<br /><span style={{ fontSize: 11, fontWeight: 400, opacity: 0.8 }}>{WHITE_CARDS.length + BLACK_CARDS.length} cartas</span></button>
+          <button style={{ ...S.nameBtn, flex: 1, ...(idioma === "en" ? { background: "#ffd700", color: "#000", border: "1px solid #ffd700" } : {}) }}
+            onClick={() => setIdioma("en")}>🇺🇸 English<br /><span style={{ fontSize: 11, fontWeight: 400, opacity: 0.8 }}>{WHITE_CARDS_EN.length + BLACK_CARDS_EN.length} cards</span></button>
+        </div>
+        <p style={{ color: "#7a7a7a", fontSize: 11, margin: "8px 0 0" }}>No se pueden mezclar idiomas en la misma partida.</p>
+      </div>
       <div style={{ marginBottom: 24 }}>
         <p style={{ color: "#888", fontSize: 13, margin: "0 0 8px" }}>🍺 Estrellas para desbloquear un shot:</p>
         <div style={{ display: "flex", gap: 6 }}>

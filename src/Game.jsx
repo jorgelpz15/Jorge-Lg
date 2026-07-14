@@ -161,6 +161,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
         <p style={{ color: "#7a7a7a", fontSize: 12, letterSpacing: 3, textTransform: "uppercase", textAlign: "center", margin: "0 0 4px" }}>Código de la sala</p>
         <div style={{ ...S.codeBox, alignSelf: "center" }}>{sala.codigo}</div>
+        <p style={{ color: "#ffd700", fontSize: 12, textAlign: "center", margin: "0 0 16px" }}>{sala.idioma === "en" ? "🇺🇸 Cartas en inglés" : "🇲🇽 Cartas en español"}</p>
         <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", marginBottom: 20 }}
           onClick={copiarInvitacion}>{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</button>
         <p style={{ color: "#888", fontSize: 13, margin: "0 0 8px" }}>Jugadores ({conectados}/{entradas.length} conectados):</p>
