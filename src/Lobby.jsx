@@ -51,11 +51,10 @@ export default function Lobby({ uid, onEntrar, codigoInicial }) {
     <div style={S.page}>
       <div style={{ textAlign: "center", maxWidth: 380 }}>
         <div style={{ fontSize: 72, marginBottom: 8 }}>🍆</div>
-        <h1 style={{ fontSize: 36, fontWeight: 900, color: "#fff", margin: 0, letterSpacing: 3, lineHeight: 1.1 }}>CARTAS</h1>
-        <p style={{ color: "#7a7a7a", fontSize: 15, letterSpacing: 6, margin: "2px 0", textTransform: "uppercase", fontWeight: 300 }}>contra la</p>
-        <h1 style={{ fontSize: 36, fontWeight: 900, color: "#fff", margin: 0, letterSpacing: 3 }}>HUMANIDAD</h1>
-        <p style={{ color: "#ffd700", fontSize: 13, marginTop: 12, letterSpacing: 2 }}>Edición México 🇲🇽 · Multijugador</p>
-        <p style={{ color: "#7a7a7a", fontSize: 11, marginTop: 4 }}>{WHITE_CARDS.length} blancas · {BLACK_CARDS.length} negras</p>
+        <h1 style={{ fontSize: 48, fontWeight: 900, color: "#fff", margin: 0, letterSpacing: 3, lineHeight: 1.1 }}>CAH</h1>
+        <p style={{ color: "#ffd700", fontSize: 15, letterSpacing: 3, margin: "10px 0 0", textTransform: "uppercase", fontWeight: 700 }}>ENG & SPA version</p>
+        <p style={{ color: "#7a7a7a", fontSize: 13, marginTop: 6 }}>Multijugador · cada quien su celular</p>
+        <p style={{ color: "#7a7a7a", fontSize: 11, marginTop: 8 }}>{WHITE_CARDS.length + BLACK_CARDS.length} cartas en español · {WHITE_CARDS_EN.length + BLACK_CARDS_EN.length} cards in English</p>
         <div style={{ width: 50, height: 2, background: "#222", margin: "28px auto" }} />
         <button style={S.btn} onClick={() => setPantalla("home")}>JUGAR</button>
         <p style={{ color: "#7a7a7a", fontSize: 11, marginTop: 20, fontStyle: "italic" }}>Un juego horrible para gente horrible</p>
