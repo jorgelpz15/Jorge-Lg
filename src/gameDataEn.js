@@ -4,7 +4,6 @@
 // el mismo tipo de licencia bajo la que ya usamos las cartas en
 // español. https://github.com/crhallberg/json-against-humanity
 // ============================================================
-import { shuffle } from "./gameData";
 
 export const WHITE_CARDS_EN = [
   "\"Tweeting.\"","(I am doing Kegels right now.)","10,000 Syrian refugees.","100% Pure New Zealand.",
