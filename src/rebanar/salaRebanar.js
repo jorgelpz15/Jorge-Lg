@@ -8,7 +8,8 @@ import { db } from "../firebase.js";
 import { figuraAleatoria, objetivoAleatorio, puntosAFirestore, puntosDesdeFirestore } from "./figuras.js";
 import { fraccionLadoMayor, extenderLinea } from "./geometria.js";
 
-const TOTAL_RONDAS = 3;
+const OPCIONES_RONDAS = [3, 5, 10];
+const TOTAL_RONDAS_POR_DEFECTO = 3;
 
 function salaRef(codigo) {
   return doc(db, "salasRebanar", codigo);
@@ -27,7 +28,7 @@ function nuevaFigura() {
   return { id: f.id, emoji: f.emoji, nombre: f.nombre, puntos: puntosAFirestore(f.puntos), objetivo: objetivoAleatorio() };
 }
 
-export async function crearSala(nombre, dificultad, uid) {
+export async function crearSala(nombre, dificultad, totalRondas, uid) {
   let codigo;
   for (let intento = 0; intento < 5; intento++) {
     codigo = generarCodigo();
@@ -37,6 +38,7 @@ export async function crearSala(nombre, dificultad, uid) {
   await setDoc(salaRef(codigo), {
     codigo, creadaEn: serverTimestamp(), fase: "espera", anfitrion: uid,
     dificultad: dificultad === "linea" ? "linea" : "deslizar",
+    totalRondas: OPCIONES_RONDAS.includes(totalRondas) ? totalRondas : TOTAL_RONDAS_POR_DEFECTO,
     jugadores: { [uid]: jugadorNuevo(nombre) },
     orden: [], ronda: 0, figuraActual: null, cortes: {}, ultimaRonda: null, salaNueva: null,
   });
@@ -44,11 +46,12 @@ export async function crearSala(nombre, dificultad, uid) {
 }
 
 // Desde la pantalla de fin, cualquiera puede armar una revancha con un solo
-// toque: crea una sala nueva y avisa en la sala vieja para que a los demás
-// (que siguen viendo la pantalla de resultados) les aparezca el botón para
-// unirse, sin tener que compartir el código a mano otra vez.
-export async function jugarOtraVez(codigoViejo, uid, nombre, dificultad) {
-  const nuevoCodigo = await crearSala(nombre, dificultad, uid);
+// toque: crea una sala nueva (misma dificultad y mismo número de rondas) y
+// avisa en la sala vieja para que a los demás (que siguen viendo la
+// pantalla de resultados) les aparezca el botón para unirse, sin tener que
+// compartir el código a mano otra vez.
+export async function jugarOtraVez(codigoViejo, uid, nombre, dificultad, totalRondas) {
+  const nuevoCodigo = await crearSala(nombre, dificultad, totalRondas, uid);
   await updateDoc(salaRef(codigoViejo), { salaNueva: nuevoCodigo });
   return nuevoCodigo;
 }
@@ -139,14 +142,14 @@ export async function enviarCorte(codigo, uid, a, b) {
 }
 
 // De la revelación se pasa a la siguiente ronda, o al final si ya se
-// jugaron las 3.
+// jugaron todas las rondas configuradas para esta sala.
 export async function avanzar(codigo) {
   const ref = salaRef(codigo);
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(ref);
     const sala = snap.data();
     if (sala.fase !== "revelando") return;
-    if (sala.ronda >= TOTAL_RONDAS) {
+    if (sala.ronda >= (sala.totalRondas || TOTAL_RONDAS_POR_DEFECTO)) {
       tx.update(ref, { fase: "fin" });
       return;
     }
@@ -156,4 +159,4 @@ export async function avanzar(codigo) {
   });
 }
 
-export { TOTAL_RONDAS };
+export { OPCIONES_RONDAS };

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { S } from "../styles.js";
-import { crearSala, unirseSala } from "./salaRebanar.js";
+import { crearSala, unirseSala, OPCIONES_RONDAS } from "./salaRebanar.js";
 
 const MENSAJES_ERROR = {
   SALA_NO_EXISTE: "Ese código no existe. Revísalo con quien creó la sala.",
@@ -13,6 +13,7 @@ export default function LobbyRebanar({ uid, onEntrar, onVolverAlMenu }) {
   const [pantalla, setPantalla] = useState("home");
   const [nombre, setNombre] = useState("");
   const [dificultad, setDificultad] = useState("deslizar");
+  const [totalRondas, setTotalRondas] = useState(3);
   const [codigoInput, setCodigoInput] = useState("");
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
@@ -22,7 +23,7 @@ export default function LobbyRebanar({ uid, onEntrar, onVolverAlMenu }) {
     setCargando(true);
     setError("");
     try {
-      const codigo = await crearSala(nombre, dificultad, uid);
+      const codigo = await crearSala(nombre, dificultad, totalRondas, uid);
       onEntrar(codigo);
     } catch (e) {
       setError("No se pudo crear la sala. Intenta de nuevo.");
@@ -50,7 +51,7 @@ export default function LobbyRebanar({ uid, onEntrar, onVolverAlMenu }) {
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{ fontSize: 52, marginBottom: 4 }}>🔪</div>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: "#fff", margin: 0 }}>A Rebanar</h1>
-          <p style={{ color: "#7a7a7a", fontSize: 12, marginTop: 8 }}>3 rondas · corta lo más cerca posible del % que te toque</p>
+          <p style={{ color: "#7a7a7a", fontSize: 12, marginTop: 8 }}>corta lo más cerca posible del % que te toque</p>
         </div>
         <button style={{ ...S.btnGold, marginBottom: 12 }} onClick={() => setPantalla("crear")}>Crear sala</button>
         <button style={{ ...S.btn, marginBottom: 12 }} onClick={() => setPantalla("unir")}>Unirme con un código</button>
@@ -73,6 +74,14 @@ export default function LobbyRebanar({ uid, onEntrar, onVolverAlMenu }) {
             onClick={() => setDificultad("deslizar")}>👆 Deslizar<br /><span style={{ fontSize: 10, fontWeight: 400, opacity: 0.8 }}>un solo trazo, más difícil</span></button>
           <button style={{ ...S.nameBtn, flex: 1, fontSize: 13, ...(dificultad === "linea" ? { background: "#ffd700", color: "#000", border: "1px solid #ffd700" } : {}) }}
             onClick={() => setDificultad("linea")}>📏 Línea<br /><span style={{ fontSize: 10, fontWeight: 400, opacity: 0.8 }}>ajustable, más fácil</span></button>
+        </div>
+      </div>
+      <div style={{ marginBottom: 24 }}>
+        <p style={{ color: "#888", fontSize: 13, margin: "0 0 8px" }}>🔪 Cuántas rondas:</p>
+        <div style={{ display: "flex", gap: 6 }}>
+          {OPCIONES_RONDAS.map((n) => (
+            <button key={n} style={{ ...S.scoreBtn, ...(totalRondas === n ? S.scoreBtnOn : {}) }} onClick={() => setTotalRondas(n)}>{n}</button>
+          ))}
         </div>
       </div>
       {error && <p style={S.errorBox}>{error}</p>}

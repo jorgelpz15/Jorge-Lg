@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { S } from "../styles.js";
 import { LIENZO, puntosDesdeFirestore } from "./figuras.js";
-import { avanzar, enviarCorte, iniciarJuego, jugarOtraVez, salirDeSalaEnEspera, unirseSala, TOTAL_RONDAS } from "./salaRebanar.js";
+import { avanzar, enviarCorte, iniciarJuego, jugarOtraVez, salirDeSalaEnEspera, unirseSala } from "./salaRebanar.js";
 
 const MARGEN_DESCONEXION_MS = 45000;
 const COLORES = ["#ffd700", "#4caf50", "#ff6b35", "#5aa9ff", "#e05aff", "#ff5a7a", "#5affe0", "#c9ff5a"];
@@ -211,7 +211,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 320, margin: "0 auto 10px" }}>
-          <span style={{ background: "#222", color: "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Ronda {sala.ronda}/{TOTAL_RONDAS}</span>
+          <span style={{ background: "#222", color: "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Ronda {sala.ronda}/{sala.totalRondas}</span>
           <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>{yo.nombre}</span>
         </div>
         <h2 style={{ fontSize: 20, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 6px" }}>
@@ -277,7 +277,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
           })}
         </div>
         <button style={S.btnGold} onClick={() => avanzar(codigo)}>
-          {sala.ronda >= TOTAL_RONDAS ? "Ver resultado final →" : "Siguiente ronda →"}
+          {sala.ronda >= sala.totalRondas ? "Ver resultado final →" : "Siguiente ronda →"}
         </button>
         <div style={{ textAlign: "center" }}><BotonSalir /></div>
       </div>
@@ -295,7 +295,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
     async function alJugarOtraVez() {
       setCargandoRevancha(true);
       try {
-        const nuevoCodigo = await jugarOtraVez(codigo, uid, yo.nombre, sala.dificultad);
+        const nuevoCodigo = await jugarOtraVez(codigo, uid, yo.nombre, sala.dificultad, sala.totalRondas);
         onEntrarSala(nuevoCodigo);
       } catch {
         setCargandoRevancha(false);
@@ -317,7 +317,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: 64, marginBottom: 4 }}>🔪</div>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>¡{nombre(ordenados[0])} corta mejor!</h1>
-          <p style={{ color: "#666", fontSize: 13, fontStyle: "italic", margin: 0 }}>{TOTAL_RONDAS} rondas jugadas</p>
+          <p style={{ color: "#666", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 5, width: "100%" }}>
           {ordenados.map((u, i) => (
