@@ -103,6 +103,17 @@ LUEGO calcular el mínimo/ganador solo entre esos. Cualquier juego futuro que
 mezcle "un valor normal" con "un valor de penalización/sentinela" en la misma
 lista debe filtrar antes de comparar, no comparar y filtrar después.
 
+## Botones de +/- que ajustan un número compartido: usar transacción
+
+En Dados, el selector de "cuántos dados" (+/-) al principio hacía
+`updateDoc(ref, { numDados: sala.numDados + 1 })` usando el valor que React
+ya tenía en pantalla. Si alguien toca +/- varias veces rápido, cada toque
+puede leer el MISMO valor viejo (porque todavía no llegó la confirmación del
+toque anterior) y el número no sube lo que debería — se "comen" toques.
+Arreglo: usar `runTransaction` para leer el valor más reciente directo del
+servidor en el momento de escribir, no el que ya tenía guardado el celular.
+Aplica a cualquier +/- o contador compartido entre varios jugadores.
+
 ## Juegos sensibles al tiempo (reacción, cronómetros)
 
 Semáforo sincroniza la secuencia de luces con un `serverTimestamp()` +

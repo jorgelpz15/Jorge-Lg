@@ -22,6 +22,13 @@ const JUEGOS = [
     descripcion: "Toca en cuanto se apaguen las luces — como una salida de F1. El más rápido gana.",
     disponible: true,
   },
+  {
+    id: "dados",
+    emoji: "🎲",
+    nombre: "Dados",
+    descripcion: "Tira hasta 10 dados y todos ven el mismo resultado al instante. Sin ganador, solo para apoyar otros juegos.",
+    disponible: true,
+  },
 ];
 
 export default function SelectorJuegos({ onElegir }) {
