@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { S } from "../styles.js";
 import { LIENZO, puntosDesdeFirestore } from "./figuras.js";
-import { avanzar, enviarCorte, iniciarJuego, salirDeSalaEnEspera, TOTAL_RONDAS } from "./salaRebanar.js";
+import { avanzar, enviarCorte, iniciarJuego, jugarOtraVez, salirDeSalaEnEspera, unirseSala, TOTAL_RONDAS } from "./salaRebanar.js";
 
 const MARGEN_DESCONEXION_MS = 45000;
 const COLORES = ["#ffd700", "#4caf50", "#ff6b35", "#5aa9ff", "#e05aff", "#ff5a7a", "#5affe0", "#c9ff5a"];
@@ -46,9 +46,10 @@ function FiguraSvg({ puntos, svgRef, children, onPointerDown, onPointerMove, onP
   );
 }
 
-export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
+export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala }) {
   const [ahora, setAhora] = useState(() => Date.now());
   const [confirmarSalida, setConfirmarSalida] = useState(false);
+  const [cargandoRevancha, setCargandoRevancha] = useState(false);
   const svgRef = useRef(null);
 
   // --- estado del corte en curso (solo local, hasta que se confirma) ---
@@ -264,11 +265,12 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
           {ordenados.map((u, i) => {
             const corte = sala.ultimaRonda.tabla[u];
             const esGanador = sala.ultimaRonda.ganadores.includes(u);
+            const logradoPct = Math.round(corte.logrado * 100);
             return (
               <div key={u} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "#111", borderRadius: 10, border: esGanador ? "1px solid #ffd700" : "1px solid #1a1a1a" }}>
                 <span style={{ width: 10, height: 10, borderRadius: 5, background: COLORES[sala.orden.indexOf(u) % COLORES.length], flexShrink: 0 }} />
                 <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: "#fff" }}>{esGanador && "👑 "}{nombre(u)}</span>
-                <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>{Math.round(corte.logrado * 100)}%</span>
+                <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>{logradoPct}% – {100 - logradoPct}%</span>
                 <span style={{ fontSize: 11, color: "#7a7a7a" }}>({Math.round(corte.error * 100)}% de error)</span>
               </div>
             );
@@ -289,6 +291,27 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
       if (j2.rondasGanadas !== j1.rondasGanadas) return j2.rondasGanadas - j1.rondasGanadas;
       return (j1.errorTotal || 0) - (j2.errorTotal || 0);
     });
+
+    async function alJugarOtraVez() {
+      setCargandoRevancha(true);
+      try {
+        const nuevoCodigo = await jugarOtraVez(codigo, uid, yo.nombre, sala.dificultad);
+        onEntrarSala(nuevoCodigo);
+      } catch {
+        setCargandoRevancha(false);
+      }
+    }
+
+    async function alUnirseARevancha() {
+      setCargandoRevancha(true);
+      try {
+        await unirseSala(sala.salaNueva, yo.nombre, uid);
+        onEntrarSala(sala.salaNueva);
+      } catch {
+        setCargandoRevancha(false);
+      }
+    }
+
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px", gap: 14 }}>
         <div style={{ textAlign: "center" }}>
@@ -306,6 +329,15 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
             </div>
           ))}
         </div>
+        {sala.salaNueva ? (
+          <button style={S.btnGold} disabled={cargandoRevancha} onClick={alUnirseARevancha}>
+            {cargandoRevancha ? "Uniendo…" : `🔁 Unirme a la revancha (${sala.salaNueva})`}
+          </button>
+        ) : (
+          <button style={S.btnGold} disabled={cargandoRevancha} onClick={alJugarOtraVez}>
+            {cargandoRevancha ? "Creando…" : "🔁 Jugar otra vez"}
+          </button>
+        )}
         <button style={S.btn} onClick={onSalir}>Salir a inicio</button>
       </div>
     );

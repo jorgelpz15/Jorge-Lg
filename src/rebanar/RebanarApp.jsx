@@ -59,5 +59,5 @@ export default function RebanarApp({ uid, onVolverAlMenu }) {
     );
   }
 
-  return <JuegoRebanar sala={sala} uid={uid} codigo={codigo} onSalir={handleSalir} />;
+  return <JuegoRebanar sala={sala} uid={uid} codigo={codigo} onSalir={handleSalir} onEntrarSala={handleEntrar} />;
 }
