@@ -132,5 +132,5 @@ export default function App() {
     );
   }
 
-  return <Game sala={sala} uid={uid} codigo={codigo} onSalir={handleSalir} />;
+  return <Game sala={sala} uid={uid} codigo={codigo} onSalir={handleSalir} onEntrarSala={handleEntrar} />;
 }

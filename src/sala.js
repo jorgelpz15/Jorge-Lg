@@ -49,9 +49,23 @@ export async function crearSala(nombre, shotsParaDesbloquear, uid, idioma) {
     votos: {},
     ultimaRonda: null,
     shotActivo: null,
+    salaNueva: null,
   };
   await setDoc(salaRef(codigo), sala);
   return codigo;
+}
+
+// Desde la pantalla de fin, cualquiera puede armar una revancha con un solo
+// toque: crea una sala nueva con la misma configuración (idioma, umbral de
+// shots) y avisa en la sala vieja para que a los demás (que siguen viendo la
+// pantalla de resultados) les aparezca el botón para unirse, sin tener que
+// compartir el código a mano otra vez.
+export async function jugarOtraVez(codigoViejo, uid, nombre) {
+  const viejaSnap = await getDoc(salaRef(codigoViejo));
+  const vieja = viejaSnap.data();
+  const nuevoCodigo = await crearSala(nombre, vieja.config?.shotsParaDesbloquear, uid, vieja.idioma);
+  await updateDoc(salaRef(codigoViejo), { salaNueva: nuevoCodigo });
+  return nuevoCodigo;
 }
 
 export async function unirseSala(codigo, nombre, uid) {

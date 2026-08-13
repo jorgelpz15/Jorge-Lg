@@ -4,6 +4,7 @@ import {
   iniciarEleccionDeInicio, elegirQuienEmpieza, enviarRespuesta, cambiarMano,
   avanzarRevelacion, iniciarVotacion, votar, enviarShot, cerrarShotActivo,
   siguienteRonda, terminarJuego, salirDeSalaEnEspera, otraRondaLibre,
+  jugarOtraVez, unirseSala,
 } from "./sala";
 
 const MARGEN_DESCONEXION_MS = 45000; // heartbeat cada 20s (ver App.jsx), doble de margen
@@ -59,7 +60,7 @@ function calcularRecomendacion(sala, remitente) {
   return { uid: masSobrio, razon: `Lleva solo ${segundos(masSobrio)}s bebidos — anda muy sobrio para esta hora 🧐` };
 }
 
-export default function Game({ sala, uid, codigo, onSalir }) {
+export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
   const [selected, setSelected] = useState([]);
   const [mostrarRefresh, setMostrarRefresh] = useState(false);
   const [vistaShotMgr, setVistaShotMgr] = useState(false);
@@ -67,6 +68,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
   const [ahora, setAhora] = useState(() => Date.now());
   const [confirmarSalida, setConfirmarSalida] = useState(false);
   const [enviandoRespuesta, setEnviandoRespuesta] = useState(false);
+  const [cargandoRevancha, setCargandoRevancha] = useState(false);
 
   useEffect(() => {
     if (sala.fase !== "espera") return;
@@ -450,6 +452,27 @@ export default function Game({ sala, uid, codigo, onSalir }) {
     const ms = [...entries].sort((a, b) => (b[1].shotsRecibidos || 0) - (a[1].shotsRecibidos || 0))[0];
     const masBorracho = [...entries].sort((a, b) => (b[1].segundosBebidos || 0) - (a[1].segundosBebidos || 0))[0];
     const masSobrio = entries.filter(([, j]) => (j.segundosBebidos || 0) > 0).sort((a, b) => (a[1].segundosBebidos || 0) - (b[1].segundosBebidos || 0))[0];
+
+    async function alJugarOtraVez() {
+      setCargandoRevancha(true);
+      try {
+        const nuevoCodigo = await jugarOtraVez(codigo, uid, yo.nombre);
+        onEntrarSala(nuevoCodigo);
+      } catch {
+        setCargandoRevancha(false);
+      }
+    }
+
+    async function alUnirseARevancha() {
+      setCargandoRevancha(true);
+      try {
+        await unirseSala(sala.salaNueva, yo.nombre, uid);
+        onEntrarSala(sala.salaNueva);
+      } catch {
+        setCargandoRevancha(false);
+      }
+    }
+
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px", gap: 14 }}>
         <div style={{ textAlign: "center" }}>
@@ -481,6 +504,15 @@ export default function Game({ sala, uid, codigo, onSalir }) {
             })}
           </div>
         </div>
+        {sala.salaNueva ? (
+          <button style={S.btnGold} disabled={cargandoRevancha} onClick={alUnirseARevancha}>
+            {cargandoRevancha ? "Uniendo…" : `🔁 Unirme a la revancha (${sala.salaNueva})`}
+          </button>
+        ) : (
+          <button style={S.btnGold} disabled={cargandoRevancha} onClick={alJugarOtraVez}>
+            {cargandoRevancha ? "Creando…" : "🔁 Jugar otra vez"}
+          </button>
+        )}
         <button style={S.btn} onClick={onSalir}>Salir a inicio</button>
       </div>
     );
