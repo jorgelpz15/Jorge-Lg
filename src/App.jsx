@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { esperarMiUid, configuracionValida } from "./firebase";
 import { escucharSala, latirPresencia } from "./sala";
 import { S } from "./styles";
+import SelectorJuegos from "./SelectorJuegos";
 import Lobby from "./Lobby";
 import Game from "./Game";
 
@@ -19,6 +20,9 @@ export default function App() {
   const [sala, setSala] = useState(null);
   const [errorSala, setErrorSala] = useState(null);
   const [codigoInicial] = useState(leerCodigoDeUrl);
+  // Un link de invitación (?codigo=1234) es siempre de CAH por ahora, así que
+  // salta directo a ese juego sin pasar por el menú de selección.
+  const [juego, setJuego] = useState(codigoInicial ? "cah" : null);
 
   useEffect(() => {
     if (!configuracionValida) return;
@@ -33,7 +37,7 @@ export default function App() {
       if (guardado) {
         try {
           const { codigo: codigoGuardado } = JSON.parse(guardado);
-          if (codigoGuardado) setCodigo(codigoGuardado);
+          if (codigoGuardado) { setJuego("cah"); setCodigo(codigoGuardado); }
         } catch { /* ignorar sesión corrupta */ }
       }
     });
@@ -77,6 +81,13 @@ export default function App() {
     setSala(null);
   }
 
+  function handleVolverAlMenu() {
+    localStorage.removeItem(CLAVE_LOCAL);
+    setCodigo(null);
+    setSala(null);
+    setJuego(null);
+  }
+
   if (!configuracionValida) {
     return (
       <div style={S.page}>
@@ -100,8 +111,25 @@ export default function App() {
     );
   }
 
+  if (!juego) {
+    return <SelectorJuegos onElegir={setJuego} />;
+  }
+
+  if (juego === "rebanar") {
+    return (
+      <div style={S.page}>
+        <div style={{ maxWidth: 380, textAlign: "center" }}>
+          <div style={{ fontSize: 56, marginBottom: 12 }}>🔪</div>
+          <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 900, margin: "0 0 10px" }}>A Rebanar</h2>
+          <p style={{ color: "#999", fontSize: 13, lineHeight: 1.5, margin: "0 0 24px" }}>Todavía se está construyendo — vuelve pronto.</p>
+          <button style={S.btn} onClick={() => setJuego(null)}>← Otros juegos</button>
+        </div>
+      </div>
+    );
+  }
+
   if (!codigo) {
-    return <Lobby uid={uid} onEntrar={handleEntrar} codigoInicial={codigoInicial} />;
+    return <Lobby uid={uid} onEntrar={handleEntrar} codigoInicial={codigoInicial} onVolverAlMenu={handleVolverAlMenu} />;
   }
 
   if (!sala) {

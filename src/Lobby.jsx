@@ -11,8 +11,8 @@ const MENSAJES_ERROR = {
   NOMBRE_REPETIDO: "Ya hay alguien con ese nombre en la sala, usa otro.",
 };
 
-export default function Lobby({ uid, onEntrar, codigoInicial }) {
-  const [pantalla, setPantalla] = useState(codigoInicial ? "unir" : "splash");
+export default function Lobby({ uid, onEntrar, codigoInicial, onVolverAlMenu }) {
+  const [pantalla, setPantalla] = useState(codigoInicial ? "unir" : "home");
   const [nombre, setNombre] = useState("");
   const [shotThreshold, setShotThreshold] = useState(5);
   const [idioma, setIdioma] = useState("es");
@@ -47,28 +47,18 @@ export default function Lobby({ uid, onEntrar, codigoInicial }) {
     }
   }
 
-  if (pantalla === "splash") return (
-    <div style={S.page}>
-      <div style={{ textAlign: "center", maxWidth: 380 }}>
-        <div style={{ fontSize: 72, marginBottom: 8 }}>🍆</div>
-        <h1 style={{ fontSize: 48, fontWeight: 900, color: "#fff", margin: 0, letterSpacing: 3, lineHeight: 1.1 }}>CAH</h1>
-        <p style={{ color: "#ffd700", fontSize: 15, letterSpacing: 3, margin: "10px 0 0", textTransform: "uppercase", fontWeight: 700 }}>ENG & SPA version</p>
-        <p style={{ color: "#7a7a7a", fontSize: 13, marginTop: 6 }}>Multijugador · cada quien su celular</p>
-        <p style={{ color: "#7a7a7a", fontSize: 11, marginTop: 8 }}>{WHITE_CARDS.length + BLACK_CARDS.length} cartas en español · {WHITE_CARDS_EN.length + BLACK_CARDS_EN.length} cards in English</p>
-        <div style={{ width: 50, height: 2, background: "#222", margin: "28px auto" }} />
-        <button style={S.btn} onClick={() => setPantalla("home")}>JUGAR</button>
-        <p style={{ color: "#7a7a7a", fontSize: 11, marginTop: 20, fontStyle: "italic" }}>Un juego horrible para gente horrible</p>
-        <p style={{ color: "#7a7a7a", fontSize: 10, marginTop: 10 }}>v{__APP_VERSION__}</p>
-      </div>
-    </div>
-  );
-
   if (pantalla === "home") return (
     <div style={S.page}>
       <div style={{ maxWidth: 380, width: "100%" }}>
-        <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 28px" }}>Cada quien desde su celular</h2>
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
+          <div style={{ fontSize: 52, marginBottom: 4 }}>🍆</div>
+          <h1 style={{ fontSize: 32, fontWeight: 900, color: "#fff", margin: 0, letterSpacing: 2 }}>CAH</h1>
+          <p style={{ color: "#ffd700", fontSize: 12, letterSpacing: 2, margin: "4px 0 0", textTransform: "uppercase", fontWeight: 700 }}>ENG & SPA version</p>
+          <p style={{ color: "#7a7a7a", fontSize: 12, marginTop: 8 }}>{WHITE_CARDS.length + BLACK_CARDS.length} cartas en español · {WHITE_CARDS_EN.length + BLACK_CARDS_EN.length} cards in English</p>
+        </div>
         <button style={{ ...S.btnGold, marginBottom: 12 }} onClick={() => setPantalla("crear")}>Crear sala</button>
-        <button style={S.btn} onClick={() => setPantalla("unir")}>Unirme con un código</button>
+        <button style={{ ...S.btn, marginBottom: 12 }} onClick={() => setPantalla("unir")}>Unirme con un código</button>
+        {onVolverAlMenu && <button style={S.navBtn} onClick={onVolverAlMenu}>← Otros juegos</button>}
       </div>
     </div>
   );
