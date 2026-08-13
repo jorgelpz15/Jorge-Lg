@@ -19,6 +19,13 @@ mejoras de un juego a los demás.
   campos — cualquier usuario autenticado puede escribir cualquier campo de
   cualquier sala. Está bien para un juego de fiesta con amigos, pero si algún
   día esto se abre al público habría que endurecerlo.
+- **Cada juego nuevo necesita su propia colección, y su propio bloque en
+  `firestore.rules`** (`match /nombreColeccion/{codigo} {...}`) — y ese
+  archivo se despliega APARTE del código con
+  `firebase deploy --only firestore:rules`. Un push a GitHub jamás lo
+  despliega solo. Se nos olvidó al agregar Semáforo y la sala no se podía
+  crear ("No se pudo crear la sala") hasta que se corrió ese comando —
+  revisarlo antes de probar un juego nuevo, no después de que falle.
 
 ## Patrón: sesión guardada en el celular (`localStorage`)
 
@@ -82,3 +89,29 @@ en caché. Subir el número en `package.json` antes de cada build/deploy.
 - Mostrar el desglose completo de un resultado partido en dos (ej. "51% –
   49%"), no solo un lado — se entiende de un vistazo sin tener que calcular
   el otro número mentalmente.
+
+## Cuidado con "valores de penalización" mezclados en un mínimo/máximo
+
+En Semáforo, una salida en falso se guarda con un tiempo de penalización fijo
+(5000ms) para que cuente como "el peor tiempo posible" al sumar el total de
+la partida. Bug real que encontramos: si se calcula el ganador de la ronda
+con `Math.min(...todos los tiempos)` ANTES de quitar a los que salieron en
+falso, ese valor de penalización puede terminar siendo "más bajo" que una
+reacción válida pero lenta — y entonces nadie gana la ronda por error (ni
+siquiera el que sí reaccionó bien). La regla: primero filtrar los válidos,
+LUEGO calcular el mínimo/ganador solo entre esos. Cualquier juego futuro que
+mezcle "un valor normal" con "un valor de penalización/sentinela" en la misma
+lista debe filtrar antes de comparar, no comparar y filtrar después.
+
+## Juegos sensibles al tiempo (reacción, cronómetros)
+
+Semáforo sincroniza la secuencia de luces con un `serverTimestamp()` +
+una demora aleatoria guardados una sola vez en la sala, y cada celular
+programa su propia animación a partir de esa hora. El tiempo de reacción se
+mide con el reloj del PROPIO celular (toque menos apagón, mismo reloj para
+las dos marcas), así que no importan diferencias de reloj entre celulares.
+Lo que sí puede variar un poco entre celulares es el momento exacto en que
+CADA UNO recibe el aviso de Firestore de que empezó la ronda (la típica
+latencia de red) — para un juego casual entre amigos es una diferencia de
+milisegundos, aceptable; no vale la pena construir sincronización de reloj
+tipo NTP para esto.

@@ -6,6 +6,7 @@ import SelectorJuegos from "./SelectorJuegos";
 import Lobby from "./Lobby";
 import Game from "./Game";
 import RebanarApp from "./rebanar/RebanarApp.jsx";
+import SemaforoApp from "./semaforo/SemaforoApp.jsx";
 
 const CLAVE_LOCAL = "cah_sesion";
 const LATIDO_MS = 20000;
@@ -118,6 +119,10 @@ export default function App() {
 
   if (juego === "rebanar") {
     return <RebanarApp uid={uid} onVolverAlMenu={() => setJuego(null)} />;
+  }
+
+  if (juego === "semaforo") {
+    return <SemaforoApp uid={uid} onVolverAlMenu={() => setJuego(null)} />;
   }
 
   if (!codigo) {

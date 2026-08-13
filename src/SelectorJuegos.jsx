@@ -15,6 +15,13 @@ const JUEGOS = [
     descripcion: "Corta la figura lo más cerca posible del porcentaje que te toque.",
     disponible: true,
   },
+  {
+    id: "semaforo",
+    emoji: "🚦",
+    nombre: "Semáforo",
+    descripcion: "Toca en cuanto se apaguen las luces — como una salida de F1. El más rápido gana.",
+    disponible: true,
+  },
 ];
 
 export default function SelectorJuegos({ onElegir }) {
