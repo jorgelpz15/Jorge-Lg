@@ -131,9 +131,8 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
             );
           })}
         </div>
-        <button style={{ ...S.btn, opacity: entradas.length >= 2 ? 1 : 0.3 }} disabled={entradas.length < 2}
-          onClick={() => iniciarJuego(codigo)}>¡ARMAR JUEGO! ({entradas.length})</button>
-        {entradas.length < 2 && <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", marginTop: 8 }}>Se necesitan mínimo 2 jugadores</p>}
+        <button style={S.btn} onClick={() => iniciarJuego(codigo)}>¡ARMAR JUEGO! ({entradas.length})</button>
+        {entradas.length < 2 && <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", marginTop: 8 }}>Puedes jugar solo para practicar, o esperar a que se unan más amigos</p>}
         <div style={{ textAlign: "center" }}><BotonSalir /></div>
       </div>
     );
@@ -316,7 +315,9 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px", gap: 14 }}>
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: 64, marginBottom: 4 }}>🔪</div>
-          <h1 style={{ fontSize: 28, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>¡{nombre(ordenados[0])} corta mejor!</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>
+            {sala.orden.length > 1 ? `¡${nombre(ordenados[0])} corta mejor!` : "¡Terminaste la práctica!"}
+          </h1>
           <p style={{ color: "#666", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 5, width: "100%" }}>
