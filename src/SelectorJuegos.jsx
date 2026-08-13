@@ -13,7 +13,7 @@ const JUEGOS = [
     emoji: "🔪",
     nombre: "A Rebanar",
     descripcion: "Corta la figura lo más cerca posible del porcentaje que te toque.",
-    disponible: false,
+    disponible: true,
   },
 ];
 

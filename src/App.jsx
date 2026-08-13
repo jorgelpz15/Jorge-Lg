@@ -5,6 +5,7 @@ import { S } from "./styles";
 import SelectorJuegos from "./SelectorJuegos";
 import Lobby from "./Lobby";
 import Game from "./Game";
+import RebanarApp from "./rebanar/RebanarApp.jsx";
 
 const CLAVE_LOCAL = "cah_sesion";
 const LATIDO_MS = 20000;
@@ -116,16 +117,7 @@ export default function App() {
   }
 
   if (juego === "rebanar") {
-    return (
-      <div style={S.page}>
-        <div style={{ maxWidth: 380, textAlign: "center" }}>
-          <div style={{ fontSize: 56, marginBottom: 12 }}>🔪</div>
-          <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 900, margin: "0 0 10px" }}>A Rebanar</h2>
-          <p style={{ color: "#999", fontSize: 13, lineHeight: 1.5, margin: "0 0 24px" }}>Todavía se está construyendo — vuelve pronto.</p>
-          <button style={S.btn} onClick={() => setJuego(null)}>← Otros juegos</button>
-        </div>
-      </div>
-    );
+    return <RebanarApp uid={uid} onVolverAlMenu={() => setJuego(null)} />;
   }
 
   if (!codigo) {
