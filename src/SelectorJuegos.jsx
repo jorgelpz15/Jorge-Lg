@@ -29,6 +29,13 @@ const JUEGOS = [
     descripcion: "Tira hasta 10 dados y todos ven el mismo resultado al instante. Sin ganador, solo para apoyar otros juegos.",
     disponible: true,
   },
+  {
+    id: "pontepedo",
+    emoji: "🍻",
+    nombre: "Ponte Pedo",
+    descripcion: "Saca una carta y todos ven el reto que les toca — regla, cascada, nunca nunca, y más.",
+    disponible: true,
+  },
 ];
 
 export default function SelectorJuegos({ onElegir }) {

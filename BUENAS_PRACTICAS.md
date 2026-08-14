@@ -13,6 +13,14 @@ mejoras de un juego a los demás.
   objetos (`[{x,y},{x,y}]`) antes de guardarlo, y convertirlo de vuelta al
   leerlo. Nos pasó dos veces (en CAH con las respuestas reveladas, y en A
   Rebanar con los puntos de las figuras) — mismo bug, mismo arreglo.
+- **Cada colección nueva (`salasXxx`) necesita su propio bloque en
+  `firestore.rules`, Y ese archivo hay que desplegarlo aparte** con
+  `firebase deploy --only firestore:rules --project cartas-cah-mx` — editar el
+  archivo local no hace nada hasta que se despliega. Se nos olvidó con
+  Semáforo la primera vez y la sala fallaba al crearse con un error genérico
+  ("No se pudo crear la sala") sin pista de que era esto. Desde entonces:
+  desplegar las reglas ANTES de probar un juego nuevo en el navegador, no
+  después.
 - Las reglas de seguridad (`firestore.rules`) por ahora solo validan que
   `request.auth != null` y que el código de sala tenga el formato correcto
   (4 dígitos). No restringen que un jugador solo pueda escribir sus propios

@@ -8,6 +8,7 @@ import Game from "./Game";
 import RebanarApp from "./rebanar/RebanarApp.jsx";
 import SemaforoApp from "./semaforo/SemaforoApp.jsx";
 import DadosApp from "./dados/DadosApp.jsx";
+import PontePedoApp from "./pontepedo/PontePedoApp.jsx";
 
 const CLAVE_LOCAL = "cah_sesion";
 const LATIDO_MS = 20000;
@@ -128,6 +129,10 @@ export default function App() {
 
   if (juego === "dados") {
     return <DadosApp uid={uid} onVolverAlMenu={() => setJuego(null)} />;
+  }
+
+  if (juego === "pontepedo") {
+    return <PontePedoApp uid={uid} onVolverAlMenu={() => setJuego(null)} />;
   }
 
   if (!codigo) {
