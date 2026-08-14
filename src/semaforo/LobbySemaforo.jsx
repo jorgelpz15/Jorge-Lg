@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { S } from "../styles.js";
-import { crearSala, unirseSala, OPCIONES_RONDAS } from "./salaSemaforo.js";
+import { crearSala, unirseSala, iniciarJuego, OPCIONES_RONDAS } from "./salaSemaforo.js";
 
 const MENSAJES_ERROR = {
   SALA_NO_EXISTE: "Ese código no existe. Revísalo con quien creó la sala.",
@@ -11,11 +11,17 @@ const MENSAJES_ERROR = {
 
 export default function LobbySemaforo({ uid, onEntrar, onVolverAlMenu }) {
   const [pantalla, setPantalla] = useState("home");
+  const [solo, setSolo] = useState(false);
   const [nombre, setNombre] = useState("");
   const [totalRondas, setTotalRondas] = useState(3);
   const [codigoInput, setCodigoInput] = useState("");
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
+
+  function abrirCrear(modoSolo) {
+    setSolo(modoSolo);
+    setPantalla("crear");
+  }
 
   async function handleCrear() {
     if (!nombre.trim()) return;
@@ -23,6 +29,7 @@ export default function LobbySemaforo({ uid, onEntrar, onVolverAlMenu }) {
     setError("");
     try {
       const codigo = await crearSala(nombre, totalRondas, uid);
+      if (solo) await iniciarJuego(codigo);
       onEntrar(codigo);
     } catch (e) {
       setError("No se pudo crear la sala. Intenta de nuevo.");
@@ -52,7 +59,8 @@ export default function LobbySemaforo({ uid, onEntrar, onVolverAlMenu }) {
           <h1 style={{ fontSize: 28, fontWeight: 900, color: "#fff", margin: 0 }}>Semáforo</h1>
           <p style={{ color: "#7a7a7a", fontSize: 12, marginTop: 8 }}>toca en cuanto se apaguen las luces — como una salida de F1</p>
         </div>
-        <button style={{ ...S.btnGold, marginBottom: 12 }} onClick={() => setPantalla("crear")}>Crear sala</button>
+        <button style={{ ...S.btn, marginBottom: 12 }} onClick={() => abrirCrear(true)}>🕹️ Jugar solo</button>
+        <button style={{ ...S.btnGold, marginBottom: 12 }} onClick={() => abrirCrear(false)}>Crear sala</button>
         <button style={{ ...S.btn, marginBottom: 12 }} onClick={() => setPantalla("unir")}>Unirme con un código</button>
         {onVolverAlMenu && <button style={S.navBtn} onClick={onVolverAlMenu}>← Otros juegos</button>}
       </div>
@@ -61,8 +69,8 @@ export default function LobbySemaforo({ uid, onEntrar, onVolverAlMenu }) {
 
   if (pantalla === "crear") return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
-      <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Crear sala</h2>
-      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>Tú serás el anfitrión de la partida</p>
+      <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>{solo ? "Jugar solo" : "Crear sala"}</h2>
+      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>{solo ? "Practica tú solo, a tu ritmo" : "Tú serás el anfitrión de la partida"}</p>
       <label style={S.fieldLabel} htmlFor="nombre-crear-s">Tu nombre</label>
       <input id="nombre-crear-s" style={{ ...S.input, width: "100%", marginBottom: 16 }} placeholder="Ej. Jorge" value={nombre}
         onChange={(e) => setNombre(e.target.value)} maxLength={12} />
@@ -76,7 +84,7 @@ export default function LobbySemaforo({ uid, onEntrar, onVolverAlMenu }) {
       </div>
       {error && <p style={S.errorBox}>{error}</p>}
       <button style={{ ...S.btn, opacity: nombre.trim() && !cargando ? 1 : 0.3 }} disabled={!nombre.trim() || cargando} onClick={handleCrear}>
-        {cargando ? "Creando..." : "Crear sala"}
+        {cargando ? "Creando..." : solo ? "Empezar" : "Crear sala"}
       </button>
       <button style={{ ...S.navBtn, marginTop: 10, width: "100%" }} onClick={() => setPantalla("home")}>← Volver</button>
     </div>

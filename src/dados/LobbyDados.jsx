@@ -10,10 +10,16 @@ const MENSAJES_ERROR = {
 
 export default function LobbyDados({ uid, onEntrar, onVolverAlMenu }) {
   const [pantalla, setPantalla] = useState("home");
+  const [solo, setSolo] = useState(false);
   const [nombre, setNombre] = useState("");
   const [codigoInput, setCodigoInput] = useState("");
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
+
+  function abrirCrear(modoSolo) {
+    setSolo(modoSolo);
+    setPantalla("crear");
+  }
 
   async function handleCrear() {
     if (!nombre.trim()) return;
@@ -50,7 +56,8 @@ export default function LobbyDados({ uid, onEntrar, onVolverAlMenu }) {
           <h1 style={{ fontSize: 28, fontWeight: 900, color: "#fff", margin: 0 }}>Dados</h1>
           <p style={{ color: "#7a7a7a", fontSize: 12, marginTop: 8 }}>tira los dados y todos ven el mismo resultado, al mismo tiempo</p>
         </div>
-        <button style={{ ...S.btnGold, marginBottom: 12 }} onClick={() => setPantalla("crear")}>Crear sala</button>
+        <button style={{ ...S.btn, marginBottom: 12 }} onClick={() => abrirCrear(true)}>🕹️ Jugar solo</button>
+        <button style={{ ...S.btnGold, marginBottom: 12 }} onClick={() => abrirCrear(false)}>Crear sala</button>
         <button style={{ ...S.btn, marginBottom: 12 }} onClick={() => setPantalla("unir")}>Unirme con un código</button>
         {onVolverAlMenu && <button style={S.navBtn} onClick={onVolverAlMenu}>← Otros juegos</button>}
       </div>
@@ -59,14 +66,14 @@ export default function LobbyDados({ uid, onEntrar, onVolverAlMenu }) {
 
   if (pantalla === "crear") return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
-      <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Crear sala</h2>
-      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>Tú serás el anfitrión</p>
+      <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>{solo ? "Jugar solo" : "Crear sala"}</h2>
+      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>{solo ? "Practica tú solo, a tu ritmo" : "Tú serás el anfitrión"}</p>
       <label style={S.fieldLabel} htmlFor="nombre-crear-d">Tu nombre</label>
       <input id="nombre-crear-d" style={{ ...S.input, width: "100%", marginBottom: 16 }} placeholder="Ej. Jorge" value={nombre}
         onChange={(e) => setNombre(e.target.value)} maxLength={12} />
       {error && <p style={S.errorBox}>{error}</p>}
       <button style={{ ...S.btn, opacity: nombre.trim() && !cargando ? 1 : 0.3 }} disabled={!nombre.trim() || cargando} onClick={handleCrear}>
-        {cargando ? "Creando..." : "Crear sala"}
+        {cargando ? "Creando..." : solo ? "Empezar" : "Crear sala"}
       </button>
       <button style={{ ...S.navBtn, marginTop: 10, width: "100%" }} onClick={() => setPantalla("home")}>← Volver</button>
     </div>
