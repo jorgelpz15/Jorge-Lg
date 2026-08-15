@@ -148,15 +148,17 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir, onEntrarSala
 
     const fondo = apagadas ? "#0d3d0d" : "#000";
     return (
-      <div
-        style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px", background: fondo, touchAction: "none", userSelect: "none" }}
-        onPointerDown={alTocar}
-      >
+      <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px", background: fondo }}>
         <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 320, margin: "0 auto 10px" }}>
           <span style={{ background: "#222", color: "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Ronda {sala.ronda}/{sala.totalRondas}</span>
           <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>{yo.nombre}</span>
         </div>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 24, minHeight: 300 }}>
+        {/* Zona de toque: solo aquí cuenta como reacción, para no chocar con
+            "Salir de la sala" si alguien lo toca durante una ronda activa. */}
+        <div
+          style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 24, minHeight: 300, width: "100%", touchAction: "none", userSelect: "none" }}
+          onPointerDown={alTocar}
+        >
           <div style={{ display: "flex", gap: 14 }}>
             {Array.from({ length: NUM_LUCES }).map((_, i) => (
               <div key={i} style={{
@@ -247,7 +249,7 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir, onEntrarSala
           <h1 style={{ fontSize: 28, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>
             {sala.orden.length > 1 ? `¡${nombre(ordenados[0])} reacciona más rápido!` : "¡Terminaste la práctica!"}
           </h1>
-          <p style={{ color: "#666", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>
+          <p style={{ color: "#7a7a7a", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 5, width: "100%" }}>
           {ordenados.map((u, i) => (

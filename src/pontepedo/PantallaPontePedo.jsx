@@ -116,7 +116,7 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
       </div>
 
       <div style={{ width: "100%", maxWidth: 380, margin: "0 auto" }}>
-        <p style={{ color: "#666", fontSize: 11, textAlign: "center", margin: "0 0 10px" }}>Quedan {sala.mazo.length} cartas en el mazo</p>
+        <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", margin: "0 0 10px" }}>Quedan {sala.mazo.length} cartas en el mazo</p>
         <button style={S.btnGold} onClick={() => sacarCarta(codigo, uid)}>🃏 SACAR CARTA</button>
         <div style={{ textAlign: "center", display: "flex", justifyContent: "center", gap: 14, marginTop: 18 }}>
           <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer" }} onClick={() => setConfirmarReinicio(true)}>Barajar de nuevo</button>

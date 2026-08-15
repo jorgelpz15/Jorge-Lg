@@ -179,7 +179,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
       setPuntoA(pt);
       setPuntoB(pt);
       setArrastrando(true);
-      e.target.setPointerCapture?.(e.pointerId);
+      try { e.target.setPointerCapture?.(e.pointerId); } catch { /* el gesto ya terminó o el pointerId ya no está activo */ }
     }
 
     function alMoverPuntero(e) {
@@ -318,7 +318,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
           <h1 style={{ fontSize: 28, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>
             {sala.orden.length > 1 ? `¡${nombre(ordenados[0])} corta mejor!` : "¡Terminaste la práctica!"}
           </h1>
-          <p style={{ color: "#666", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>
+          <p style={{ color: "#7a7a7a", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 5, width: "100%" }}>
           {ordenados.map((u, i) => (
