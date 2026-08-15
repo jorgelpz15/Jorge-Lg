@@ -7,8 +7,10 @@ import JuegoRebanar from "./JuegoRebanar.jsx";
 const CLAVE_LOCAL = "rebanar_sesion";
 const LATIDO_MS = 20000;
 
-export default function RebanarApp({ uid, onVolverAlMenu }) {
+export default function RebanarApp({ uid, onVolverAlMenu, codigoInicial }) {
   const [codigo, setCodigo] = useState(() => {
+    // Un link de invitación manda sobre una sesión guardada vieja.
+    if (codigoInicial) return null;
     try {
       const guardado = localStorage.getItem(CLAVE_LOCAL);
       return guardado ? JSON.parse(guardado).codigo || null : null;
@@ -48,7 +50,7 @@ export default function RebanarApp({ uid, onVolverAlMenu }) {
   }
 
   if (!codigo) {
-    return <LobbyRebanar uid={uid} onEntrar={handleEntrar} onVolverAlMenu={onVolverAlMenu} />;
+    return <LobbyRebanar uid={uid} onEntrar={handleEntrar} onVolverAlMenu={onVolverAlMenu} codigoInicial={codigoInicial} />;
   }
 
   if (!sala) {

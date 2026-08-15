@@ -9,13 +9,13 @@ const MENSAJES_ERROR = {
   NOMBRE_REPETIDO: "Ya hay alguien con ese nombre en la sala, usa otro.",
 };
 
-export default function LobbyRebanar({ uid, onEntrar, onVolverAlMenu }) {
-  const [pantalla, setPantalla] = useState("home");
+export default function LobbyRebanar({ uid, onEntrar, onVolverAlMenu, codigoInicial }) {
+  const [pantalla, setPantalla] = useState(codigoInicial ? "unir" : "home");
   const [solo, setSolo] = useState(false);
   const [nombre, setNombre] = useState("");
   const [dificultad, setDificultad] = useState("deslizar");
   const [totalRondas, setTotalRondas] = useState(3);
-  const [codigoInput, setCodigoInput] = useState("");
+  const [codigoInput, setCodigoInput] = useState(codigoInicial || "");
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
 
@@ -103,7 +103,9 @@ export default function LobbyRebanar({ uid, onEntrar, onVolverAlMenu }) {
   if (pantalla === "unir") return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Unirme a una sala</h2>
-      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>Pide el código de 4 dígitos a quien creó la sala</p>
+      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>
+        {codigoInicial ? "Te invitaron a esta partida — solo falta tu nombre" : "Pide el código de 4 dígitos a quien creó la sala"}
+      </p>
       <label style={S.fieldLabel} htmlFor="nombre-unir-r">Tu nombre</label>
       <input id="nombre-unir-r" style={{ ...S.input, width: "100%", marginBottom: 12 }} placeholder="Ej. Jorge" value={nombre}
         onChange={(e) => setNombre(e.target.value)} maxLength={12} />

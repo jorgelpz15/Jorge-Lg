@@ -1,6 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { S } from "../styles.js";
 import { sacarCarta, establecerRegla, reiniciarMazo, salirDeSala, REGLAS } from "./salaPontePedo.js";
+
+const MARGEN_DESCONEXION_MS = 45000;
+
+function estaConectado(visto, ahora) {
+  if (!visto) return true;
+  const ms = typeof visto.toMillis === "function" ? visto.toMillis() : 0;
+  return ahora - ms < MARGEN_DESCONEXION_MS;
+}
 
 function colorPalo(palo) {
   return palo === "♥️" || palo === "♦️" ? "#ff4444" : "#222";
@@ -11,14 +19,31 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
   const [confirmarReinicio, setConfirmarReinicio] = useState(false);
   const [editandoRegla, setEditandoRegla] = useState(false);
   const [reglaInput, setReglaInput] = useState("");
+  const [copiado, setCopiado] = useState(false);
+  const [ahora, setAhora] = useState(() => Date.now());
   const entradas = Object.entries(sala.jugadores);
   const yo = sala.jugadores[uid];
   const carta = sala.cartaActual;
   const info = carta ? REGLAS[carta.valor] : null;
 
+  useEffect(() => {
+    const t = setInterval(() => setAhora(Date.now()), 5000);
+    return () => clearInterval(t);
+  }, []);
+
   async function confirmarSalir() {
     await salirDeSala(codigo, uid);
     onSalir();
+  }
+
+  async function copiarInvitacion() {
+    const link = `${location.origin}/?juego=pontepedo&codigo=${sala.codigo}`;
+    const texto = `¡Únete a mi partida de Ponte Pedo! ${link} (código: ${sala.codigo})`;
+    try {
+      await navigator.clipboard.writeText(texto);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch { /* el navegador no dio permiso de portapapeles, no pasa nada grave */ }
   }
 
   function abrirEditorRegla() {
@@ -69,10 +94,17 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
         <span style={{ background: "#222", color: "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Sala {sala.codigo}</span>
         <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>{yo.nombre}</span>
       </div>
+      <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", margin: "10px 0" }}
+        onClick={copiarInvitacion}>{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</button>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", margin: "8px 0 14px", maxWidth: 380 }}>
-        {entradas.map(([u, j]) => (
-          <span key={u} style={{ ...S.chip, opacity: 0.85 }}>{j.nombre}{u === sala.anfitrion && " 👑"}</span>
-        ))}
+        {entradas.map(([u, j]) => {
+          const online = estaConectado(j.visto, ahora);
+          return (
+            <span key={u} style={{ ...S.chip, opacity: online ? 0.85 : 0.4 }}>
+              <span style={{ color: online ? "#4caf50" : "#7a7a7a" }}>●</span> {j.nombre}{u === sala.anfitrion && " 👑"}
+            </span>
+          );
+        })}
       </div>
 
       {editandoRegla ? (

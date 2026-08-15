@@ -50,6 +50,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
   const [ahora, setAhora] = useState(() => Date.now());
   const [confirmarSalida, setConfirmarSalida] = useState(false);
   const [cargandoRevancha, setCargandoRevancha] = useState(false);
+  const [copiado, setCopiado] = useState(false);
   const svgRef = useRef(null);
 
   // --- estado del corte en curso (solo local, hasta que se confirma) ---
@@ -78,6 +79,16 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
   async function confirmarSalir() {
     if (sala.fase === "espera") await salirDeSalaEnEspera(codigo, uid);
     onSalir();
+  }
+
+  async function copiarInvitacion() {
+    const link = `${location.origin}/?juego=rebanar&codigo=${sala.codigo}`;
+    const texto = `¡Únete a mi partida de A Rebanar! ${link} (código: ${sala.codigo})`;
+    try {
+      await navigator.clipboard.writeText(texto);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch { /* el navegador no dio permiso de portapapeles, no pasa nada grave */ }
   }
 
   function BotonSalir() {
@@ -116,6 +127,8 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
         <p style={{ color: "#7a7a7a", fontSize: 12, letterSpacing: 3, textTransform: "uppercase", textAlign: "center", margin: "0 0 4px" }}>Código de la sala</p>
         <div style={{ ...S.codeBox, alignSelf: "center" }}>{sala.codigo}</div>
         <p style={{ color: "#ffd700", fontSize: 12, textAlign: "center", margin: "0 0 16px" }}>{sala.dificultad === "linea" ? "📏 Modo línea" : "👆 Modo deslizar"}</p>
+        <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", marginBottom: 20 }}
+          onClick={copiarInvitacion}>{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</button>
         <p style={{ color: "#888", fontSize: 13, margin: "0 0 8px" }}>Jugadores ({conectados}/{entradas.length} conectados):</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 28 }}>
           {entradas.map(([u, j]) => {

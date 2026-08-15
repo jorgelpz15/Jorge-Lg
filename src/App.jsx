@@ -13,9 +13,17 @@ import PontePedoApp from "./pontepedo/PontePedoApp.jsx";
 const CLAVE_LOCAL = "cah_sesion";
 const LATIDO_MS = 20000;
 
-function leerCodigoDeUrl() {
-  const codigo = new URLSearchParams(location.search).get("codigo");
-  return codigo && /^\d{4}$/.test(codigo) ? codigo : null;
+const JUEGOS_VALIDOS = ["cah", "rebanar", "semaforo", "dados", "pontepedo"];
+
+// Un link de invitación trae el juego (?juego=rebanar) y el código
+// (?codigo=1234). Los links viejos sin "juego" son siempre de CAH, para no
+// romper invitaciones ya mandadas antes de que existieran los otros juegos.
+function leerInvitacionDeUrl() {
+  const params = new URLSearchParams(location.search);
+  const codigo = params.get("codigo");
+  if (!codigo || !/^\d{4}$/.test(codigo)) return { codigo: null, juego: null };
+  const juego = params.get("juego");
+  return { codigo, juego: JUEGOS_VALIDOS.includes(juego) ? juego : "cah" };
 }
 
 export default function App() {
@@ -23,10 +31,10 @@ export default function App() {
   const [codigo, setCodigo] = useState(null);
   const [sala, setSala] = useState(null);
   const [errorSala, setErrorSala] = useState(null);
-  const [codigoInicial] = useState(leerCodigoDeUrl);
-  // Un link de invitación (?codigo=1234) es siempre de CAH por ahora, así que
-  // salta directo a ese juego sin pasar por el menú de selección.
-  const [juego, setJuego] = useState(codigoInicial ? "cah" : null);
+  const [invitacion] = useState(leerInvitacionDeUrl);
+  const codigoInicial = invitacion.codigo;
+  // Un link de invitación salta directo a ese juego sin pasar por el menú.
+  const [juego, setJuego] = useState(invitacion.juego);
 
   useEffect(() => {
     if (!configuracionValida) return;
@@ -120,19 +128,19 @@ export default function App() {
   }
 
   if (juego === "rebanar") {
-    return <RebanarApp uid={uid} onVolverAlMenu={() => setJuego(null)} />;
+    return <RebanarApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} />;
   }
 
   if (juego === "semaforo") {
-    return <SemaforoApp uid={uid} onVolverAlMenu={() => setJuego(null)} />;
+    return <SemaforoApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} />;
   }
 
   if (juego === "dados") {
-    return <DadosApp uid={uid} onVolverAlMenu={() => setJuego(null)} />;
+    return <DadosApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} />;
   }
 
   if (juego === "pontepedo") {
-    return <PontePedoApp uid={uid} onVolverAlMenu={() => setJuego(null)} />;
+    return <PontePedoApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} />;
   }
 
   if (!codigo) {
