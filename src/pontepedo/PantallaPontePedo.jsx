@@ -129,19 +129,19 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, width: "100%" }}>
         {carta ? (
-          <>
-            <div style={{ width: 130, height: 182, borderRadius: 14, background: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 20px rgba(0,0,0,0.5)" }}>
+          <div key={`${carta.en?.seconds ?? ""}-${carta.en?.nanoseconds ?? ""}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+            <div className="pop-in" style={{ width: 130, height: 182, borderRadius: 14, background: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 20px rgba(0,0,0,0.5)" }}>
               <span style={{ fontSize: 40, fontWeight: 900, color: colorPalo(carta.palo), lineHeight: 1 }}>
                 {carta.valor === "JOKER" ? "🃏" : carta.valor}
               </span>
               {carta.valor !== "JOKER" && <span style={{ fontSize: 32, color: colorPalo(carta.palo) }}>{carta.palo}</span>}
             </div>
-            <div style={{ textAlign: "center", maxWidth: 340 }}>
+            <div className="fade-rise" style={{ textAlign: "center", maxWidth: 340 }}>
               <p style={{ color: "#ffd700", fontSize: 19, fontWeight: 900, margin: "0 0 6px" }}>{info.emoji} {info.nombre}</p>
               <p style={{ color: "#ccc", fontSize: 13, lineHeight: 1.5, margin: 0 }}>{info.texto}</p>
             </div>
             <p style={{ color: "#7a7a7a", fontSize: 11, margin: 0 }}>Sacó {sala.jugadores[carta.sacadaPor]?.nombre || "alguien"}</p>
-          </>
+          </div>
         ) : (
           <p style={{ color: "#7a7a7a", fontSize: 14, textAlign: "center" }}>Nadie ha sacado carta todavía</p>
         )}

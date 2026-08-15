@@ -260,11 +260,11 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
     const puntosFigura = puntosDesdeFirestore(sala.figuraActual.puntos);
     const ordenados = [...sala.orden].sort((a, b) => sala.ultimaRonda.tabla[a].error - sala.ultimaRonda.tabla[b].error);
     return (
-      <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
-        <h2 style={{ fontSize: 20, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 4px" }}>
+      <div key={sala.ronda} style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
+        <h2 className="fade-rise" style={{ fontSize: 20, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 4px" }}>
           Resultados — {sala.figuraActual.emoji} {sala.figuraActual.nombre}
         </h2>
-        <p style={{ color: "#ffd700", fontSize: 13, fontWeight: 700, textAlign: "center", margin: "0 0 14px" }}>Objetivo: {objetivoPct}% – {100 - objetivoPct}%</p>
+        <p className="fade-rise" style={{ color: "#ffd700", fontSize: 13, fontWeight: 700, textAlign: "center", margin: "0 0 14px" }}>Objetivo: {objetivoPct}% – {100 - objetivoPct}%</p>
         <svg viewBox={`0 0 ${LIENZO} ${LIENZO}`} style={{ width: "100%", maxWidth: 320, aspectRatio: "1/1", display: "block", margin: "0 auto 16px", background: "#000", borderRadius: 16 }}>
           <polygon points={puntosFigura.map((p) => p.join(",")).join(" ")} fill="#fff" stroke="#333" strokeWidth="2" />
           {sala.orden.map((u, i) => {
@@ -327,8 +327,8 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px", gap: 14 }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 64, marginBottom: 4 }}>🔪</div>
-          <h1 style={{ fontSize: 28, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>
+          <div className="pop-in" style={{ fontSize: 64, marginBottom: 4 }}>🔪</div>
+          <h1 className="fade-rise" style={{ fontSize: 28, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>
             {sala.orden.length > 1 ? `¡${nombre(ordenados[0])} corta mejor!` : "¡Terminaste la práctica!"}
           </h1>
           <p style={{ color: "#7a7a7a", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>

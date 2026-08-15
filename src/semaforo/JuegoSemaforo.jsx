@@ -172,17 +172,18 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir, onEntrarSala
           style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 24, minHeight: 300, width: "100%", touchAction: "none", userSelect: "none" }}
           onPointerDown={alTocar}
         >
-          <div style={{ display: "flex", gap: 14 }}>
+          <div style={{ display: "flex", gap: 14, padding: 10, background: "#161616", borderRadius: 16 }}>
             {Array.from({ length: NUM_LUCES }).map((_, i) => (
               <div key={i} style={{
-                width: 40, height: 40, borderRadius: "50%",
-                background: !apagadas && i < lucesEncendidas ? "#ff2222" : "#2a2a2a",
+                width: 44, height: 44, borderRadius: "50%",
+                background: !apagadas && i < lucesEncendidas ? "#ff2222" : "#666",
                 boxShadow: !apagadas && i < lucesEncendidas ? "0 0 18px 4px rgba(255,34,34,0.7)" : "none",
-                border: "2px solid #444", transition: "background 0.1s",
+                border: "2px solid #888", transition: "background 0.1s",
               }} />
             ))}
           </div>
-          <p style={{ color: apagadas ? "#fff" : "#7a7a7a", fontSize: apagadas ? 22 : 14, fontWeight: apagadas ? 900 : 400, textAlign: "center", margin: 0 }}>
+          <p key={apagadas ? "on" : "off"} className={apagadas ? "pop-in" : ""}
+            style={{ color: apagadas ? "#fff" : "#7a7a7a", fontSize: apagadas ? 22 : 14, fontWeight: apagadas ? 900 : 400, textAlign: "center", margin: 0 }}>
             {apagadas ? "¡TOCA AHORA!" : "Espera a que se apaguen las luces…"}
           </p>
         </div>
@@ -195,11 +196,11 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir, onEntrarSala
   if (sala.fase === "revelando") {
     const ordenados = [...sala.orden].sort((a, b) => sala.ultimaRonda.tabla[a].reaccionMs - sala.ultimaRonda.tabla[b].reaccionMs);
     return (
-      <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
-        <h2 style={{ fontSize: 20, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 4px" }}>
+      <div key={sala.ronda} style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
+        <h2 className="fade-rise" style={{ fontSize: 20, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 4px" }}>
           Resultados de la ronda {sala.ronda}
         </h2>
-        <p style={{ color: "#ffd700", fontSize: 13, fontWeight: 700, textAlign: "center", margin: "0 0 20px" }}>
+        <p className="fade-rise" style={{ color: "#ffd700", fontSize: 13, fontWeight: 700, textAlign: "center", margin: "0 0 20px" }}>
           {sala.ultimaRonda.ganadores.length ? `👑 ${sala.ultimaRonda.ganadores.map(nombre).join(", ")}` : "Nadie reaccionó a tiempo — todos salieron en falso"}
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 20 }}>
@@ -258,8 +259,8 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir, onEntrarSala
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px", gap: 14 }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 64, marginBottom: 4 }}>🚦</div>
-          <h1 style={{ fontSize: 28, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>
+          <div className="pop-in" style={{ fontSize: 64, marginBottom: 4 }}>🚦</div>
+          <h1 className="fade-rise" style={{ fontSize: 28, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>
             {sala.orden.length > 1 ? `¡${nombre(ordenados[0])} reacciona más rápido!` : "¡Terminaste la práctica!"}
           </h1>
           <p style={{ color: "#7a7a7a", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>

@@ -41,14 +41,25 @@ input:focus-visible {
   border-radius: 2px;
 }
 
-/* Pequeño "pop" cuando cae un resultado nuevo de dados (ver src/dados/). */
+/* Pequeño "pop" cuando cae un resultado nuevo (dados, carta, figura de
+   A Rebanar, trofeo final...) — el mismo efecto en todos los juegos. */
 @keyframes dado-pop {
   0% { transform: scale(0.4) rotate(-8deg); opacity: 0.3; }
   60% { transform: scale(1.08) rotate(3deg); opacity: 1; }
   100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
-.dado-pop {
+.dado-pop, .pop-in {
   animation: dado-pop 0.35s ease-out;
+}
+
+/* Para textos/banners que aparecen en un momento clave (ganador de ronda,
+   "¡TOCA AHORA!", pantalla final) — un fade con una leve subida. */
+@keyframes fade-rise {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.fade-rise {
+  animation: fade-rise 0.3s ease-out;
 }
 
 /* El juego usa transiciones cortas (selección de carta, presionar botón).

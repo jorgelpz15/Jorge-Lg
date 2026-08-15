@@ -69,6 +69,20 @@ export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
   const [confirmarSalida, setConfirmarSalida] = useState(false);
   const [enviandoRespuesta, setEnviandoRespuesta] = useState(false);
   const [cargandoRevancha, setCargandoRevancha] = useState(false);
+  const [cargandoSiguienteRonda, setCargandoSiguienteRonda] = useState(false);
+
+  // El clic en "Siguiente Ronda" solo escribe en Firestore — el cambio real
+  // de pantalla llega después, cuando el listener recibe la ronda nueva. Sin
+  // este aviso, esa espera (que puede tardar unos segundos con conexión
+  // lenta) se siente como que el juego se quedó trabado.
+  useEffect(() => {
+    setCargandoSiguienteRonda(false);
+  }, [sala.fase, sala.ronda]);
+
+  async function handleSiguienteRonda() {
+    setCargandoSiguienteRonda(true);
+    await siguienteRonda(codigo);
+  }
 
   useEffect(() => {
     if (sala.fase !== "espera") return;
@@ -436,8 +450,10 @@ export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
           </div>
         )}
         <div style={{ display: "flex", gap: 8 }}>
-          <button style={{ ...S.btn, flex: 1 }} onClick={() => siguienteRonda(codigo)}>Siguiente Ronda →</button>
-          <button style={{ ...S.btnSm, background: "#1a0000", color: "#ff4444", border: "1px solid #ff4444", padding: "14px 12px" }} onClick={() => terminarJuego(codigo)}>FIN</button>
+          <button style={{ ...S.btn, flex: 1, opacity: cargandoSiguienteRonda ? 0.6 : 1 }} disabled={cargandoSiguienteRonda} onClick={handleSiguienteRonda}>
+            {cargandoSiguienteRonda ? "Cargando…" : "Siguiente Ronda →"}
+          </button>
+          <button style={{ ...S.btnSm, background: "#1a0000", color: "#ff4444", border: "1px solid #ff4444", padding: "14px 12px" }} disabled={cargandoSiguienteRonda} onClick={() => terminarJuego(codigo)}>FIN</button>
         </div>
         <div style={{ textAlign: "center" }}><BotonSalir /></div>
       </div>
