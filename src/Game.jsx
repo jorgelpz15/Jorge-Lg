@@ -179,7 +179,7 @@ export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
         <div style={{ ...S.codeBox, alignSelf: "center" }}>{sala.codigo}</div>
         <p style={{ color: "#ffd700", fontSize: 12, textAlign: "center", margin: "0 0 16px" }}>{sala.idioma === "en" ? "🇺🇸 Cartas en inglés" : "🇲🇽 Cartas en español"}</p>
         <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", marginBottom: 20 }}
-          onClick={copiarInvitacion}>{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</button>
+          onClick={copiarInvitacion}><span key={copiado} className="fade-rise">{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</span></button>
         <p style={{ color: "#888", fontSize: 13, margin: "0 0 8px" }}>Jugadores ({conectados}/{entradas.length} conectados):</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 28 }}>
           {entradas.map(([u, j]) => {
@@ -313,7 +313,7 @@ export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
         <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 4px" }}>Respuestas</h2>
         <p style={{ textAlign: "center", color: "#7a7a7a", fontSize: 13, margin: "0 0 16px" }}>{sala.revIdx + 1} de {sala.revSubs.length}</p>
         <div style={{ background: "#000", padding: "22px 18px", borderRadius: 14, border: "2px solid #333", marginBottom: 16 }}>
-          <p style={{ color: "#fff", fontSize: 19, fontWeight: 700, lineHeight: 1.4, margin: 0 }}>{cur ? renderB(sala.cartaNegra.text, cur.cartas) : ""}</p>
+          <p key={sala.revIdx} className="fade-in-fast" style={{ color: "#fff", fontSize: 19, fontWeight: 700, lineHeight: 1.4, margin: 0 }}>{cur ? renderB(sala.cartaNegra.text, cur.cartas) : ""}</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button style={{ ...S.navBtn, opacity: sala.revIdx > 0 ? 1 : 0.3 }} disabled={sala.revIdx === 0} onClick={() => avanzarRevelacion(codigo, sala.revIdx - 1)}>← Anterior</button>
@@ -400,7 +400,7 @@ export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
     const pendientes = sala.orden.filter((u) => (sala.jugadores[u].shotsDisponibles || 0) > 0);
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "24px 18px", gap: 12 }}>
-        <div style={{ textAlign: "center" }}>
+        <div key={sala.ronda} className="fade-rise" style={{ textAlign: "center" }}>
           <p style={{ color: "#888", fontSize: 12, margin: "0 0 4px" }}>Ronda {sala.ronda}{sala.esRondaDorada ? " 🏆 DORADA" : ""}</p>
           <h2 style={{ fontSize: 22, fontWeight: 900, color: "#ffd700", margin: 0 }}>
             {ur.ganadores.length === 1 ? `¡${nombre(ur.ganadores[0])} gana!` : `¡Empate: ${ur.ganadores.map(nombre).join(" & ")}!`}
@@ -492,9 +492,9 @@ export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px", gap: 14 }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 64, marginBottom: 4 }}>🏆</div>
-          <h1 style={{ fontSize: 32, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>¡{sorted[0][1].nombre} gana!</h1>
-          <p style={{ color: "#7a7a7a", fontSize: 13, fontStyle: "italic", margin: 0 }}>La peor persona de la noche</p>
+          <div className="pop-in" style={{ fontSize: 64, marginBottom: 4 }}>🏆</div>
+          <h1 className="fade-rise" style={{ fontSize: 32, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>¡{sorted[0][1].nombre} gana!</h1>
+          <p className="fade-rise" style={{ color: "#7a7a7a", fontSize: 13, fontStyle: "italic", margin: 0 }}>La peor persona de la noche</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 5, width: "100%" }}>
           {sorted.map(([u, j], i) => (
