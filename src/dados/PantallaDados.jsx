@@ -96,7 +96,7 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
         <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>{yo.nombre}</span>
       </div>
       <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", margin: "10px 0" }}
-        onClick={copiarInvitacion}>{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</button>
+        onClick={copiarInvitacion}><span key={copiado} className="fade-rise">{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</span></button>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", margin: "8px 0 24px", maxWidth: 380 }}>
         {entradas.map(([u, j]) => {
           const online = estaConectado(j.visto, ahora);

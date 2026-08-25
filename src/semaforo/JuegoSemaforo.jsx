@@ -114,7 +114,7 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir, onEntrarSala
         <div style={{ ...S.codeBox, alignSelf: "center" }}>{sala.codigo}</div>
         <p style={{ color: "#ffd700", fontSize: 12, textAlign: "center", margin: "0 0 16px" }}>{sala.totalRondas} rondas</p>
         <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", marginBottom: 20 }}
-          onClick={copiarInvitacion}>{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</button>
+          onClick={copiarInvitacion}><span key={copiado} className="fade-rise">{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</span></button>
         <p style={{ color: "#888", fontSize: 13, margin: "0 0 8px" }}>Jugadores ({conectados}/{entradas.length} conectados):</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 28 }}>
           {entradas.map(([u, j]) => {
