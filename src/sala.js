@@ -244,15 +244,24 @@ export async function enviarRespuesta(codigo, uid, cartas) {
   });
 }
 
-export async function cambiarMano(codigo, sala, uid) {
-  const jugador = sala.jugadores[uid];
-  let mazo = shuffle([...sala.mazoBlanco, ...jugador.mano]);
-  const manoNueva = mazo.slice(0, MANO_INICIAL);
-  const restante = mazo.slice(MANO_INICIAL);
-  await updateDoc(salaRef(codigo), {
-    mazoBlanco: restante,
-    [`jugadores.${uid}.mano`]: manoNueva,
-    [`jugadores.${uid}.estrellas`]: (jugador.estrellas || 0) - 1,
+export async function cambiarMano(codigo, uid) {
+  // Transacción: mazoBlanco es compartido y enviarRespuesta también lo toca;
+  // si esto leyera el mazo del estado local de React (posiblemente viejo) y
+  // escribiera con updateDoc, podría pisar cartas que otro jugador ya robó
+  // al mismo tiempo (cartas duplicadas o perdidas). Ver BUENAS_PRACTICAS.md.
+  const ref = salaRef(codigo);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    const sala = snap.data();
+    const jugador = sala.jugadores[uid];
+    const mazo = shuffle([...sala.mazoBlanco, ...jugador.mano]);
+    const manoNueva = mazo.slice(0, MANO_INICIAL);
+    const restante = mazo.slice(MANO_INICIAL);
+    tx.update(ref, {
+      mazoBlanco: restante,
+      [`jugadores.${uid}.mano`]: manoNueva,
+      [`jugadores.${uid}.estrellas`]: (jugador.estrellas || 0) - 1,
+    });
   });
 }
 
@@ -368,15 +377,23 @@ function calcularResultadoRonda(sala, votos) {
 
 // -------------------- Shots --------------------
 
-export async function enviarShot(codigo, sala, de, para) {
-  const jDe = sala.jugadores[de];
-  const jPara = sala.jugadores[para];
-  await updateDoc(salaRef(codigo), {
-    [`jugadores.${de}.shotsDisponibles`]: Math.max(0, (jDe.shotsDisponibles || 0) - 1),
-    [`jugadores.${de}.shotsEnviados.${para}`]: (jDe.shotsEnviados?.[para] || 0) + 1,
-    [`jugadores.${para}.shotsRecibidos`]: (jPara.shotsRecibidos || 0) + 1,
-    [`jugadores.${para}.segundosBebidos`]: (jPara.segundosBebidos || 0) + 5,
-    shotActivo: { de, para },
+export async function enviarShot(codigo, de, para) {
+  // Transacción por la misma razón que cambiarMano: si dos shots se mandan
+  // casi al mismo tiempo (p. ej. dos jugadores al mismo destinatario), leer
+  // los contadores del estado local de React puede perder un incremento.
+  const ref = salaRef(codigo);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    const sala = snap.data();
+    const jDe = sala.jugadores[de];
+    const jPara = sala.jugadores[para];
+    tx.update(ref, {
+      [`jugadores.${de}.shotsDisponibles`]: Math.max(0, (jDe.shotsDisponibles || 0) - 1),
+      [`jugadores.${de}.shotsEnviados.${para}`]: (jDe.shotsEnviados?.[para] || 0) + 1,
+      [`jugadores.${para}.shotsRecibidos`]: (jPara.shotsRecibidos || 0) + 1,
+      [`jugadores.${para}.segundosBebidos`]: (jPara.segundosBebidos || 0) + 5,
+      shotActivo: { de, para },
+    });
   });
 }
 

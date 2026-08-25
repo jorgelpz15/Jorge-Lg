@@ -292,7 +292,7 @@ export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
               <p style={{ color: "#aaa", fontSize: 12, margin: "0 0 10px" }}>Pierdes tus {mano.length} cartas, recibes 10 nuevas y te cuesta 1⭐</p>
               <div style={{ display: "flex", gap: 8 }}>
                 <button style={{ ...S.btnSm, flex: 1, background: "#333", color: "#aaa", fontSize: 12 }} onClick={() => setMostrarRefresh(false)}>Cancelar</button>
-                <button style={{ ...S.btnSm, flex: 1, background: "#ffd700", color: "#000", fontSize: 12 }} onClick={() => { cambiarMano(codigo, sala, uid); setSelected([]); setMostrarRefresh(false); }}>Sí, cambiar</button>
+                <button style={{ ...S.btnSm, flex: 1, background: "#ffd700", color: "#000", fontSize: 12 }} onClick={() => { cambiarMano(codigo, uid); setSelected([]); setMostrarRefresh(false); }}>Sí, cambiar</button>
               </div>
             </div>
           )}
@@ -380,7 +380,7 @@ export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {objetivos.map((t) => (
               <button key={t} style={{ ...S.nameBtn, border: rec?.uid === t ? "2px solid #ffd700" : "1px solid #333" }}
-                onClick={() => { enviarShot(codigo, sala, uid, t); setVistaShotMgr(false); }}>
+                onClick={() => { enviarShot(codigo, uid, t); setVistaShotMgr(false); }}>
                 <span>🍺 → {nombre(t)}</span>
                 <span style={{ color: "#7a7a7a", fontSize: 11, marginLeft: 8 }}>{sala.jugadores[t]?.segundosBebidos || 0}s bebidos</span>
                 {rec?.uid === t && <span style={{ marginLeft: 4 }}>⭐</span>}
