@@ -30,7 +30,8 @@ export const REGLAS = {
   JOKER: { emoji: "🃏", nombre: "Todos toman", texto: "Sin condición, todos toman." },
 };
 
-function shuffle(arr) {
+// Exportado por la misma razón que mazoNuevo (ver abajo).
+export function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -39,7 +40,9 @@ function shuffle(arr) {
   return a;
 }
 
-function mazoNuevo() {
+// Exportado para el modo "Jugar solo" (PantallaPontePedoSolo), que arma y
+// maneja su propio mazo en memoria local, sin sala de Firestore.
+export function mazoNuevo() {
   const cartas = [];
   for (const valor of VALORES) {
     for (const palo of PALOS) cartas.push({ valor, palo });

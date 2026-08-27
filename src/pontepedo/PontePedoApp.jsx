@@ -3,6 +3,7 @@ import { S } from "../styles.js";
 import { escucharSala, latirPresencia } from "./salaPontePedo.js";
 import LobbyPontePedo from "./LobbyPontePedo.jsx";
 import PantallaPontePedo from "./PantallaPontePedo.jsx";
+import PantallaPontePedoSolo from "./PantallaPontePedoSolo.jsx";
 
 const CLAVE_LOCAL = "pontepedo_sesion";
 const LATIDO_MS = 20000;
@@ -17,6 +18,7 @@ export default function PontePedoApp({ uid, onVolverAlMenu, codigoInicial }) {
     } catch { return null; }
   });
   const [sala, setSala] = useState(null);
+  const [modoSolo, setModoSolo] = useState(false);
 
   useEffect(() => {
     if (!codigo) return;
@@ -49,8 +51,15 @@ export default function PontePedoApp({ uid, onVolverAlMenu, codigoInicial }) {
     setSala(null);
   }
 
+  if (modoSolo) {
+    return <PantallaPontePedoSolo onSalir={() => setModoSolo(false)} />;
+  }
+
   if (!codigo) {
-    return <LobbyPontePedo uid={uid} onEntrar={handleEntrar} onVolverAlMenu={onVolverAlMenu} codigoInicial={codigoInicial} />;
+    return (
+      <LobbyPontePedo uid={uid} onEntrar={handleEntrar} onJugarSolo={() => setModoSolo(true)}
+        onVolverAlMenu={onVolverAlMenu} codigoInicial={codigoInicial} />
+    );
   }
 
   if (!sala) {

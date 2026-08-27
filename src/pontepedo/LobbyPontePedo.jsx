@@ -8,7 +8,7 @@ const MENSAJES_ERROR = {
   NOMBRE_REPETIDO: "Ya hay alguien con ese nombre en la sala, usa otro.",
 };
 
-export default function LobbyPontePedo({ uid, onEntrar, onVolverAlMenu, codigoInicial }) {
+export default function LobbyPontePedo({ uid, onEntrar, onJugarSolo, onVolverAlMenu, codigoInicial }) {
   const [pantalla, setPantalla] = useState(codigoInicial ? "unir" : "home");
   const [nombre, setNombre] = useState("");
   const [codigoInput, setCodigoInput] = useState(codigoInicial || "");
@@ -52,6 +52,12 @@ export default function LobbyPontePedo({ uid, onEntrar, onVolverAlMenu, codigoIn
         </div>
         <button style={{ ...S.btnGold, marginBottom: 12 }} onClick={() => setPantalla("crear")}>Crear sala</button>
         <button style={{ ...S.btn, marginBottom: 12 }} onClick={() => setPantalla("unir")}>Unirme con un código</button>
+        <button style={{ ...S.btn, marginBottom: 12, background: "#1a1a1a", color: "#ffd700", border: "1px solid #333" }} onClick={onJugarSolo}>
+          🃏 Jugar solo (un dispositivo)
+        </button>
+        <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", margin: "-4px 0 12px" }}>
+          Para pasar un mismo celular o tablet entre el grupo — sin código de sala.
+        </p>
         {onVolverAlMenu && <button style={S.navBtn} onClick={onVolverAlMenu}>← Otros juegos</button>}
       </div>
     </div>
