@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { S } from "../styles.js";
 import { sacarCarta, establecerRegla, reiniciarMazo, salirDeSala, REGLAS } from "./salaPontePedo.js";
+import ModalReglas from "./ModalReglas.jsx";
 
 const MARGEN_DESCONEXION_MS = 45000;
 
@@ -21,6 +22,8 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
   const [reglaInput, setReglaInput] = useState("");
   const [copiado, setCopiado] = useState(false);
   const [ahora, setAhora] = useState(() => Date.now());
+  const [verReglas, setVerReglas] = useState(false);
+  const [sacando, setSacando] = useState(false);
   const entradas = Object.entries(sala.jugadores);
   const yo = sala.jugadores[uid];
   const carta = sala.cartaActual;
@@ -56,6 +59,18 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
     setEditandoRegla(false);
   }
 
+  // Evita que un doble-toque accidental (fácil de noche, con poca luz o
+  // unos tragos encima) queme dos cartas de un jalón.
+  async function handleSacarCarta() {
+    if (sacando) return;
+    setSacando(true);
+    try {
+      await sacarCarta(codigo, uid);
+    } finally {
+      setSacando(false);
+    }
+  }
+
   if (confirmarSalida) {
     return (
       <div style={S.page}>
@@ -70,6 +85,10 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
         </div>
       </div>
     );
+  }
+
+  if (verReglas) {
+    return <ModalReglas onCerrar={() => setVerReglas(false)} />;
   }
 
   if (confirmarReinicio) {
@@ -96,16 +115,22 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
       </div>
       <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", margin: "10px 0" }}
         onClick={copiarInvitacion}><span key={copiado} className="fade-rise">{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</span></button>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", margin: "8px 0 14px", maxWidth: 380 }}>
+      <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", margin: "0 0 8px" }}>
+        Jugadores ({entradas.filter(([, j]) => estaConectado(j.visto, ahora)).length}/{entradas.length} conectados)
+      </p>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", margin: "0 0 14px", maxWidth: 380 }}>
         {entradas.map(([u, j]) => {
           const online = estaConectado(j.visto, ahora);
           return (
             <span key={u} style={{ ...S.chip, opacity: online ? 0.85 : 0.4 }}>
               <span style={{ color: online ? "#4caf50" : "#7a7a7a" }}>●</span> {j.nombre}{u === sala.anfitrion && " 👑"}
+              {!online && <span style={{ color: "#7a7a7a", fontSize: 10 }}> · desconectado</span>}
             </span>
           );
         })}
       </div>
+      <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 11, textDecoration: "underline", cursor: "pointer", alignSelf: "center", marginBottom: 4 }}
+        onClick={() => setVerReglas(true)}>📋 Ver todas las reglas</button>
 
       {editandoRegla ? (
         <div style={{ background: "#1a1000", border: "1px solid #ffd700", borderRadius: 12, padding: "10px 14px", marginBottom: 14, width: "100%", maxWidth: 380, boxSizing: "border-box" }}>
@@ -149,7 +174,9 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
 
       <div style={{ width: "100%", maxWidth: 380, margin: "0 auto" }}>
         <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", margin: "0 0 10px" }}>Quedan {sala.mazo.length} cartas en el mazo</p>
-        <button style={S.btnGold} onClick={() => sacarCarta(codigo, uid)}>🃏 SACAR CARTA</button>
+        <button style={{ ...S.btnGold, opacity: sacando ? 0.6 : 1 }} disabled={sacando} onClick={handleSacarCarta}>
+          {sacando ? "SACANDO…" : "🃏 SACAR CARTA"}
+        </button>
         <div style={{ textAlign: "center", display: "flex", justifyContent: "center", gap: 14, marginTop: 18 }}>
           <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer" }} onClick={() => setConfirmarReinicio(true)}>Barajar de nuevo</button>
           <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer" }} onClick={() => setConfirmarSalida(true)}>Salir de la sala</button>

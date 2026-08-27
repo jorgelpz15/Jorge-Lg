@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { S } from "../styles.js";
 import { REGLAS, mazoNuevo, shuffle } from "./salaPontePedo.js";
+import ModalReglas from "./ModalReglas.jsx";
 
 // Modo "un solo dispositivo": todo vive en memoria local (sin sala, sin
 // Firestore, sin internet). Pensado para pasar un solo celular/iPad entre
@@ -18,10 +19,16 @@ export default function PantallaPontePedoSolo({ onSalir }) {
   const [editandoRegla, setEditandoRegla] = useState(false);
   const [reglaInput, setReglaInput] = useState("");
   const [tick, setTick] = useState(0);
+  const [verReglas, setVerReglas] = useState(false);
+  const [sacando, setSacando] = useState(false);
 
   const info = cartaActual ? REGLAS[cartaActual.valor] : null;
 
+  // Mismo candado que en el modo multijugador: un doble-toque accidental de
+  // noche/con tragos no debe quemar dos cartas de un jalón.
   function sacarCarta() {
+    if (sacando) return;
+    setSacando(true);
     let m = [...mazo];
     let d = cartaActual ? [...descarte, cartaActual] : [...descarte];
     if (m.length === 0) {
@@ -33,6 +40,7 @@ export default function PantallaPontePedoSolo({ onSalir }) {
     setDescarte(d);
     setCartaActual(carta);
     setTick((t) => t + 1);
+    setTimeout(() => setSacando(false), 250);
   }
 
   function reiniciar() {
@@ -46,6 +54,10 @@ export default function PantallaPontePedoSolo({ onSalir }) {
   function abrirEditorRegla() {
     setReglaInput(reglaActiva);
     setEditandoRegla(true);
+  }
+
+  if (verReglas) {
+    return <ModalReglas onCerrar={() => setVerReglas(false)} />;
   }
 
   if (confirmarReinicio) {
@@ -70,6 +82,8 @@ export default function PantallaPontePedoSolo({ onSalir }) {
         <span style={{ background: "#222", color: "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>🍻 Modo solo</span>
         <span style={{ fontSize: 12, color: "#7a7a7a", fontWeight: 700 }}>Pásense el celular</span>
       </div>
+      <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 11, textDecoration: "underline", cursor: "pointer", alignSelf: "center", margin: "8px 0 0" }}
+        onClick={() => setVerReglas(true)}>📋 Ver todas las reglas</button>
 
       {editandoRegla ? (
         <div style={{ background: "#1a1000", border: "1px solid #ffd700", borderRadius: 12, padding: "10px 14px", margin: "10px 0 14px", width: "100%", maxWidth: 380, boxSizing: "border-box" }}>
@@ -112,7 +126,9 @@ export default function PantallaPontePedoSolo({ onSalir }) {
 
       <div style={{ width: "100%", maxWidth: 380, margin: "0 auto" }}>
         <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", margin: "0 0 10px" }}>Quedan {mazo.length} cartas en el mazo</p>
-        <button style={S.btnGold} onClick={sacarCarta}>🃏 SACAR CARTA</button>
+        <button style={{ ...S.btnGold, opacity: sacando ? 0.6 : 1 }} disabled={sacando} onClick={sacarCarta}>
+          {sacando ? "SACANDO…" : "🃏 SACAR CARTA"}
+        </button>
         <div style={{ textAlign: "center", display: "flex", justifyContent: "center", gap: 14, marginTop: 18 }}>
           <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer" }} onClick={() => setConfirmarReinicio(true)}>Barajar de nuevo</button>
           <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer" }} onClick={onSalir}>← Menú</button>
