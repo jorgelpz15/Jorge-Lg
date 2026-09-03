@@ -23,6 +23,12 @@ reemplaza.
   para Firestore/Auth (proyecto `cartas-cah-mx`), `firebase.json` no tiene
   bloque de `hosting`
 
+## Skills a usar
+
+- Para cualquier trabajo con Firestore (queries, reglas de seguridad,
+  transacciones, seeding, modelado de datos) usar la skill
+  `firebase-firestore`.
+
 ## Reglas técnicas que SIEMPRE hay que respetar
 
 - **No arrays anidados en Firestore** (`[[x,y],[x,y]]`). Convertir a array de
