@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { S } from "../styles.js";
 import { crearSala, unirseSala, iniciarJuego, OPCIONES_RONDAS } from "./salaSemaforo.js";
-
-const MENSAJES_ERROR = {
-  SALA_NO_EXISTE: "Ese código no existe. Revísalo con quien creó la sala.",
-  SALA_YA_EMPEZO: "Esa partida ya empezó. Pide que armen una nueva sala.",
-  SALA_LLENA: "Esa sala ya tiene 8 jugadores (el máximo).",
-  NOMBRE_REPETIDO: "Ya hay alguien con ese nombre en la sala, usa otro.",
-};
+import { MENSAJES_ERROR_TURNO as MENSAJES_ERROR } from "../mensajesError.js";
 
 export default function LobbySemaforo({ uid, onEntrar, onVolverAlMenu, codigoInicial }) {
   const [pantalla, setPantalla] = useState(codigoInicial ? "unir" : "home");

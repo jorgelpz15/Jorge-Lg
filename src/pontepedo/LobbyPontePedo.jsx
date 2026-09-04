@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { S } from "../styles.js";
 import { crearSala, unirseSala } from "./salaPontePedo.js";
-
-const MENSAJES_ERROR = {
-  SALA_NO_EXISTE: "Ese código no existe. Revísalo con quien creó la sala.",
-  SALA_LLENA: "Esa sala ya tiene 12 jugadores (el máximo).",
-  NOMBRE_REPETIDO: "Ya hay alguien con ese nombre en la sala, usa otro.",
-};
+import { MENSAJES_ERROR_LIBRE as MENSAJES_ERROR } from "../mensajesError.js";
 
 export default function LobbyPontePedo({ uid, onEntrar, onJugarSolo, onVolverAlMenu, codigoInicial }) {
   const [pantalla, setPantalla] = useState(codigoInicial ? "unir" : "home");

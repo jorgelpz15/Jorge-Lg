@@ -3,13 +3,7 @@ import { S } from "./styles";
 import { WHITE_CARDS, BLACK_CARDS } from "./gameData";
 import { WHITE_CARDS_EN, BLACK_CARDS_EN } from "./gameDataEn";
 import { crearSala, unirseSala } from "./sala";
-
-const MENSAJES_ERROR = {
-  SALA_NO_EXISTE: "Ese código no existe. Revísalo con quien creó la sala.",
-  SALA_YA_EMPEZO: "Esa partida ya empezó. Pide que armen una nueva sala.",
-  SALA_LLENA: "Esa sala ya tiene 8 jugadores (el máximo).",
-  NOMBRE_REPETIDO: "Ya hay alguien con ese nombre en la sala, usa otro.",
-};
+import { MENSAJES_ERROR_TURNO as MENSAJES_ERROR } from "./mensajesError";
 
 export default function Lobby({ uid, onEntrar, codigoInicial, onVolverAlMenu }) {
   const [pantalla, setPantalla] = useState(codigoInicial ? "unir" : "home");
