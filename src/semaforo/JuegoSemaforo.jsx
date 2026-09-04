@@ -4,6 +4,7 @@ import {
   avanzar, enviarReaccion, iniciarJuego, jugarOtraVez, salirDeSalaEnEspera, unirseSala,
   NUM_LUCES, MS_ENTRE_LUCES,
 } from "./salaSemaforo.js";
+import ComoSeJuega from "../ComoSeJuega.jsx";
 
 const MARGEN_DESCONEXION_MS = 45000;
 
@@ -130,6 +131,7 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir, onEntrarSala
             );
           })}
         </div>
+        <ComoSeJuega storageKey="semaforo_reglas_vistas" texto="Espera a que se apaguen TODAS las luces antes de tocar la pantalla. Tocar antes de tiempo = salida en falso, y cuenta como el peor tiempo posible de la ronda. Gana quien reaccione más rápido sin adelantarse." />
         <button style={S.btn} onClick={() => iniciarJuego(codigo)}>¡ARMAR JUEGO! ({entradas.length})</button>
         {entradas.length < 2 && <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", marginTop: 8 }}>Puedes jugar solo para practicar, o esperar a que se unan más amigos</p>}
         <div style={{ textAlign: "center" }}><BotonSalir /></div>

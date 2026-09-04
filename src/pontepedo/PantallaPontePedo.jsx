@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { S } from "../styles.js";
 import { sacarCarta, establecerRegla, reiniciarMazo, salirDeSala, REGLAS } from "./salaPontePedo.js";
 import ModalReglas from "./ModalReglas.jsx";
+import ComoSeJuega from "../ComoSeJuega.jsx";
 
 const MARGEN_DESCONEXION_MS = 45000;
 
@@ -129,6 +130,7 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
           );
         })}
       </div>
+      <ComoSeJuega storageKey="pontepedo_reglas_vistas" texto={'Cualquiera saca carta y todos ven el mismo reto — pasen el celular o júntense alrededor de una pantalla. Cada carta tiene su propia regla (toca "Ver todas las reglas" para verlas todas de un jalón antes de empezar).'} />
       <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 11, textDecoration: "underline", cursor: "pointer", alignSelf: "center", marginBottom: 4 }}
         onClick={() => setVerReglas(true)}>📋 Ver todas las reglas</button>
 

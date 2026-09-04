@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { S } from "../styles.js";
 import { LIENZO, puntosDesdeFirestore } from "./figuras.js";
 import { avanzar, enviarCorte, iniciarJuego, jugarOtraVez, salirDeSalaEnEspera, unirseSala } from "./salaRebanar.js";
+import ComoSeJuega from "../ComoSeJuega.jsx";
 
 const MARGEN_DESCONEXION_MS = 45000;
 const COLORES = ["#ffd700", "#4caf50", "#ff6b35", "#5aa9ff", "#e05aff", "#ff5a7a", "#5affe0", "#c9ff5a"];
@@ -144,6 +145,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
             );
           })}
         </div>
+        <ComoSeJuega storageKey="rebanar_reglas_vistas" texto="Te toca un porcentaje (ej. 40%). Corta la figura lo más cerca posible de ese punto exacto — desliza el dedo o arrastra la línea, según el modo de la sala. Gana quien se acerque más al objetivo." />
         <button style={S.btn} onClick={() => iniciarJuego(codigo)}>¡ARMAR JUEGO! ({entradas.length})</button>
         {entradas.length < 2 && <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", marginTop: 8 }}>Puedes jugar solo para practicar, o esperar a que se unan más amigos</p>}
         <div style={{ textAlign: "center" }}><BotonSalir /></div>

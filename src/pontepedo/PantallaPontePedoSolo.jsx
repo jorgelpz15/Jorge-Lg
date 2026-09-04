@@ -2,6 +2,7 @@ import { useState } from "react";
 import { S } from "../styles.js";
 import { REGLAS, mazoNuevo, shuffle } from "./salaPontePedo.js";
 import ModalReglas from "./ModalReglas.jsx";
+import ComoSeJuega from "../ComoSeJuega.jsx";
 
 // Modo "un solo dispositivo": todo vive en memoria local (sin sala, sin
 // Firestore, sin internet). Pensado para pasar un solo celular/iPad entre
@@ -82,7 +83,10 @@ export default function PantallaPontePedoSolo({ onSalir }) {
         <span style={{ background: "#222", color: "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>🍻 Modo solo</span>
         <span style={{ fontSize: 12, color: "#7a7a7a", fontWeight: 700 }}>Pásense el celular</span>
       </div>
-      <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 11, textDecoration: "underline", cursor: "pointer", alignSelf: "center", margin: "8px 0 0" }}
+      <div style={{ marginTop: 10 }}>
+        <ComoSeJuega storageKey="pontepedo_reglas_vistas" texto={'Cualquiera saca carta y todos ven el mismo reto — pasen el celular o júntense alrededor de una pantalla. Cada carta tiene su propia regla (toca "Ver todas las reglas" para verlas todas de un jalón antes de empezar).'} />
+      </div>
+      <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 11, textDecoration: "underline", cursor: "pointer", alignSelf: "center", margin: "0 0 0" }}
         onClick={() => setVerReglas(true)}>📋 Ver todas las reglas</button>
 
       {editandoRegla ? (

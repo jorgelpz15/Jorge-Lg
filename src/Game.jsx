@@ -6,6 +6,7 @@ import {
   siguienteRonda, terminarJuego, salirDeSalaEnEspera, otraRondaLibre,
   jugarOtraVez, unirseSala,
 } from "./sala";
+import ComoSeJuega from "./ComoSeJuega";
 
 const MARGEN_DESCONEXION_MS = 45000; // heartbeat cada 20s (ver App.jsx), doble de margen
 
@@ -195,6 +196,7 @@ export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
             );
           })}
         </div>
+        <ComoSeJuega storageKey="cah_reglas_vistas" texto={'Sale una carta negra con un espacio en blanco (o dos si dice "ELIGE 2"). Completa el hueco con tu carta blanca más chistosa u oscura. Todos votan por la mejor combinación — quien gana se lleva una ⭐ (dos en ronda dorada).'} />
         <button style={{ ...S.btn, opacity: entradas.length >= 2 ? 1 : 0.3 }} disabled={entradas.length < 2}
           onClick={() => iniciarEleccionDeInicio(codigo)}>¡ARMAR JUEGO! ({entradas.length})</button>
         {entradas.length < 2 && <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", marginTop: 8 }}>Se necesitan mínimo 2 jugadores</p>}
