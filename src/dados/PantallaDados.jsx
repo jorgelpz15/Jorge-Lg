@@ -48,6 +48,7 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
   const [confirmarSalida, setConfirmarSalida] = useState(false);
   const [copiado, setCopiado] = useState(false);
   const [ahora, setAhora] = useState(() => Date.now());
+  const [tirando, setTirando] = useState(false);
   const entradas = Object.entries(sala.jugadores);
   const yo = sala.jugadores[uid];
 
@@ -69,6 +70,19 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
       setCopiado(true);
       setTimeout(() => setCopiado(false), 2000);
     } catch { /* el navegador no dio permiso de portapapeles, no pasa nada grave */ }
+  }
+
+  // Evita que un doble-toque accidental (de noche, con poca luz o unos
+  // tragos encima) dispare dos tiradas de un jalón — mismo candado que ya
+  // tienen CAH y Ponte Pedo.
+  async function handleTirar() {
+    if (tirando) return;
+    setTirando(true);
+    try {
+      await tirarDados(codigo, uid, sala.numDados);
+    } finally {
+      setTirando(false);
+    }
   }
 
   if (confirmarSalida) {
@@ -97,12 +111,16 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
       </div>
       <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", margin: "10px 0" }}
         onClick={copiarInvitacion}><span key={copiado} className="fade-rise">{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</span></button>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", margin: "8px 0 24px", maxWidth: 380 }}>
+      <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", margin: "0 0 8px" }}>
+        Jugadores ({entradas.filter(([, j]) => estaConectado(j.visto, ahora)).length}/{entradas.length} conectados)
+      </p>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", margin: "0 0 24px", maxWidth: 380 }}>
         {entradas.map(([u, j]) => {
           const online = estaConectado(j.visto, ahora);
           return (
             <span key={u} style={{ ...S.chip, opacity: online ? 0.85 : 0.4 }}>
               <span style={{ color: online ? "#4caf50" : "#7a7a7a" }}>●</span> {j.nombre}{u === sala.anfitrion && " 👑"}
+              {!online && <span style={{ color: "#7a7a7a", fontSize: 10 }}> · desconectado</span>}
             </span>
           );
         })}
@@ -130,7 +148,9 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
           <button style={{ ...S.scoreBtn, width: 40, height: 40 }} disabled={sala.numDados >= MAX_DADOS}
             onClick={() => ajustarNumDados(codigo, 1)}>+</button>
         </div>
-        <button style={S.btnGold} onClick={() => tirarDados(codigo, uid, sala.numDados)}>🎲 TIRAR DADOS</button>
+        <button style={{ ...S.btnGold, opacity: tirando ? 0.6 : 1 }} disabled={tirando} onClick={handleTirar}>
+          {tirando ? "TIRANDO…" : "🎲 TIRAR DADOS"}
+        </button>
         <div style={{ textAlign: "center" }}>
           <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer", marginTop: 18 }}
             onClick={() => setConfirmarSalida(true)}>Salir de la sala</button>
