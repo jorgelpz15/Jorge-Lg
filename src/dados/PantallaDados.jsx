@@ -49,6 +49,11 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
   const [copiado, setCopiado] = useState(false);
   const [ahora, setAhora] = useState(() => Date.now());
   const [tirando, setTirando] = useState(false);
+  // El contador +/- se siente lento si espera la confirmación de Firestore
+  // en cada toque (un viaje redondo completo por tap). Se actualiza local y
+  // optimista de inmediato, y se resincroniza solo si el valor real del
+  // servidor cambia (por ejemplo, si otro jugador también lo está tocando).
+  const [numDadosLocal, setNumDadosLocal] = useState(sala.numDados);
   const entradas = Object.entries(sala.jugadores);
   const yo = sala.jugadores[uid];
 
@@ -56,6 +61,15 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
     const t = setInterval(() => setAhora(Date.now()), 5000);
     return () => clearInterval(t);
   }, []);
+
+  useEffect(() => {
+    setNumDadosLocal(sala.numDados);
+  }, [sala.numDados]);
+
+  function handleAjustar(delta) {
+    setNumDadosLocal((n) => Math.min(MAX_DADOS, Math.max(MIN_DADOS, n + delta)));
+    ajustarNumDados(codigo, delta);
+  }
 
   async function confirmarSalir() {
     await salirDeSala(codigo, uid);
@@ -79,7 +93,7 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
     if (tirando) return;
     setTirando(true);
     try {
-      await tirarDados(codigo, uid, sala.numDados);
+      await tirarDados(codigo, uid, numDadosLocal);
     } finally {
       setTirando(false);
     }
@@ -142,11 +156,17 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
 
       <div style={{ width: "100%", maxWidth: 380, margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, marginBottom: 16 }}>
-          <button style={{ ...S.scoreBtn, width: 40, height: 40 }} disabled={sala.numDados <= MIN_DADOS}
-            onClick={() => ajustarNumDados(codigo, -1)}>−</button>
-          <span style={{ color: "#fff", fontSize: 16, fontWeight: 700, minWidth: 90, textAlign: "center" }}>{sala.numDados} dado{sala.numDados > 1 ? "s" : ""}</span>
-          <button style={{ ...S.scoreBtn, width: 40, height: 40 }} disabled={sala.numDados >= MAX_DADOS}
-            onClick={() => ajustarNumDados(codigo, 1)}>+</button>
+          <button
+            style={{ ...S.scoreBtn, width: 40, height: 40, border: numDadosLocal > MIN_DADOS ? "3px solid #fff" : S.scoreBtn.border }}
+            disabled={numDadosLocal <= MIN_DADOS}
+            onClick={() => handleAjustar(-1)}
+          >−</button>
+          <span style={{ color: "#fff", fontSize: 16, fontWeight: 700, minWidth: 90, textAlign: "center" }}>{numDadosLocal} dado{numDadosLocal > 1 ? "s" : ""}</span>
+          <button
+            style={{ ...S.scoreBtn, width: 40, height: 40, border: numDadosLocal < MAX_DADOS ? "3px solid #fff" : S.scoreBtn.border }}
+            disabled={numDadosLocal >= MAX_DADOS}
+            onClick={() => handleAjustar(1)}
+          >+</button>
         </div>
         <button style={{ ...S.btnGold, opacity: tirando ? 0.6 : 1 }} disabled={tirando} onClick={handleTirar}>
           {tirando ? "TIRANDO…" : "🎲 TIRAR DADOS"}
