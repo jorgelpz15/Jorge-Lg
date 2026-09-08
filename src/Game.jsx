@@ -318,9 +318,9 @@ export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
           <p key={sala.revIdx} className="fade-in-fast" style={{ color: "#fff", fontSize: 19, fontWeight: 700, lineHeight: 1.4, margin: 0 }}>{cur ? renderB(sala.cartaNegra.text, cur.cartas) : ""}</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button style={{ ...S.navBtn, opacity: sala.revIdx > 0 ? 1 : 0.3 }} disabled={sala.revIdx === 0} onClick={() => avanzarRevelacion(codigo, sala.revIdx - 1)}>← Anterior</button>
+          <button style={{ ...S.navBtn, flex: 1, opacity: sala.revIdx > 0 ? 1 : 0.3 }} disabled={sala.revIdx === 0} onClick={() => avanzarRevelacion(codigo, sala.revIdx - 1)}>← Anterior</button>
           {sala.revIdx < sala.revSubs.length - 1
-            ? <button style={S.navBtn} onClick={() => avanzarRevelacion(codigo, sala.revIdx + 1)}>Siguiente →</button>
+            ? <button style={{ ...S.navBtn, flex: 1 }} onClick={() => avanzarRevelacion(codigo, sala.revIdx + 1)}>Siguiente →</button>
             : sala.modoLibre
               ? <button style={S.btnGold} onClick={() => otraRondaLibre(codigo)}>Otra ronda 😂</button>
               : <button style={S.btnGold} onClick={() => iniciarVotacion(codigo)}>¡A VOTAR!</button>}

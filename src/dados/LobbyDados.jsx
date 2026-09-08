@@ -70,7 +70,7 @@ export default function LobbyDados({ uid, onEntrar, onVolverAlMenu, codigoInicia
       <button style={{ ...S.btn, opacity: nombre.trim() && !cargando ? 1 : 0.3 }} disabled={!nombre.trim() || cargando} onClick={handleCrear}>
         {cargando ? "Creando..." : solo ? "Empezar" : "Crear sala"}
       </button>
-      <button style={{ ...S.navBtn, marginTop: 10, width: "100%" }} onClick={() => setPantalla("home")}>← Volver</button>
+      <button style={{ ...S.navBtn, marginTop: 14, width: "100%" }} onClick={() => setPantalla("home")}>← Volver</button>
     </div>
   );
 
@@ -92,7 +92,7 @@ export default function LobbyDados({ uid, onEntrar, onVolverAlMenu, codigoInicia
         disabled={!nombre.trim() || codigoInput.length !== 4 || cargando} onClick={handleUnirse}>
         {cargando ? "Uniendo..." : "Unirme"}
       </button>
-      <button style={{ ...S.navBtn, marginTop: 10, width: "100%" }} onClick={() => setPantalla("home")}>← Volver</button>
+      <button style={{ ...S.navBtn, marginTop: 14, width: "100%" }} onClick={() => setPantalla("home")}>← Volver</button>
     </div>
   );
 
