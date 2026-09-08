@@ -6,6 +6,30 @@ se arme un juego nuevo, o se le agregue algo a uno existente, se revise esta
 lista primero — para no repetir el mismo bug dos veces, y para copiar las
 mejoras de un juego a los demás.
 
+## Elección de librerías — cuándo sí y cuándo no (03-sep-2026)
+
+Antes de agregar una dependencia nueva, justificar por qué hace falta en
+ESTE hub, no por "es lo que se usa normalmente en React":
+
+- **Redux u otro state manager global: NO.** Los listeners de Firestore en
+  tiempo real ya son el estado global compartido entre jugadores (ver
+  patrón de sesión/sala arriba). Agregar Redux encima duplicaría esa fuente
+  de verdad sin necesidad.
+- **Axios: NO.** Se habla con Firebase vía su propio SDK
+  (Firestore/Auth/Functions), no con una API REST genérica — `httpsCallable`
+  ya cubre llamadas a Cloud Functions.
+- **Lodash: NO,** salvo que aparezca una necesidad concreta de manipulación
+  de datos compleja. JS moderno (`.map`/`.filter`/`.reduce`) alcanza para el
+  tamaño de estos juegos.
+- **Jest: SÍ, pendiente de instalar.** Ninguno de los juegos tiene tests
+  automatizados todavía. Ya hubo bugs reales que un test hubiera atrapado
+  antes de probar a mano en el celular — el de `Math.min` con valores de
+  penalización en Semáforo, y el de `runTransaction` en Dados (ver abajo).
+  Buen candidato: tests sobre la lógica de reglas de cada juego (quién gana
+  la ronda, cálculo de puntos), no sobre la UI.
+- **Luxon:** no aplica a este hub por ahora (no hay lógica de horarios de
+  negocio aquí, a diferencia de Vitrina Local).
+
 ## Reglas técnicas de Firestore
 
 - **No se permiten arrays anidados** (un array cuyos elementos son arrays,
