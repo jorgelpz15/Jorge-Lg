@@ -139,6 +139,11 @@ export const CANCIONES = {
 };
 ```
 
+**Regla de clasificación: cada canción va en la era de su año real de
+lanzamiento, no de cuándo se volvió popular o se hizo conocida.** Adivinar
+correctamente ese desfase (una canción que "se siente" de otra época) es justo
+parte de la gracia del juego — no hay que suavizarlo agrupando por vibra.
+
 **Set inicial propuesto para tu revisión antes de cargarlo** (mezcla de éxitos en
 inglés y latinos/mexicanos, pensando en tu grupo — ajusta lo que no cuadre; años de
 mejor esfuerzo, vale la pena que confirmes los que más te importen):
@@ -146,12 +151,13 @@ mejor esfuerzo, vale la pena que confirmes los que más te importen):
 - **80s:** Billie Jean (MJ, 1983) · Sweet Child O' Mine (GNR, 1987) · Livin' on a
   Prayer (Bon Jovi, 1986) · Take on Me (a-ha, 1985) · Thriller (MJ, 1982) · Total
   Eclipse of the Heart (Bonnie Tyler, 1983) · Africa (Toto, 1982) · Querida (Juan
-  Gabriel, 1984) · Amor Eterno (Juan Gabriel, 1984) · La Bamba (Los Lobos, 1987)
+  Gabriel, 1984) · Amor Eterno (Juan Gabriel, 1984) · La Bamba (Los Lobos, 1987) ·
+  La Incondicional (Luis Miguel, 1988)
 - **90s:** Smells Like Teen Spirit (Nirvana, 1991) · Wonderwall (Oasis, 1995) · …Baby
   One More Time (Britney Spears, 1998) · Livin' la Vida Loca (Ricky Martin, 1999) ·
   My Heart Will Go On (Celine Dion, 1997) · Macarena (Los Del Río, 1996) · Como la
-  Flor (Selena, 1992) · Rayando el Sol (Maná, 1990) · La Incondicional (Luis Miguel,
-  1988→pop en 90s, revisar) · Genie in a Bottle (Christina Aguilera, 1999)
+  Flor (Selena, 1992) · Rayando el Sol (Maná, 1990) · Genie in a Bottle (Christina
+  Aguilera, 1999)
 - **2000s:** Hey Ya! (OutKast, 2003) · Crazy in Love (Beyoncé, 2003) · Hips Don't
   Lie (Shakira, 2006) · Toxic (Britney Spears, 2003) · Poker Face (Lady Gaga, 2008)
   · Since U Been Gone (Kelly Clarkson, 2004) · Sálvame (RBD, 2005) · Ni Una Sola
