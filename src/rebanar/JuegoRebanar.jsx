@@ -267,14 +267,15 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir, onEntrarSala 
           Resultados — {sala.figuraActual.emoji} {sala.figuraActual.nombre}
         </h2>
         <p className="fade-rise" style={{ color: "#ffd700", fontSize: 13, fontWeight: 700, textAlign: "center", margin: "0 0 14px" }}>Objetivo: {objetivoPct}% – {100 - objetivoPct}%</p>
-        <svg viewBox={`0 0 ${LIENZO} ${LIENZO}`} style={{ width: "100%", maxWidth: 320, aspectRatio: "1/1", display: "block", margin: "0 auto 16px", background: "#000", borderRadius: 16 }}>
-          <polygon points={puntosFigura.map((p) => p.join(",")).join(" ")} fill="#fff" stroke="#333" strokeWidth="2" />
-          {sala.orden.map((u, i) => {
-            const corte = sala.ultimaRonda.tabla[u];
-            const [p1, p2] = lineaExtendidaVisual(corte.a, corte.b);
-            return <line key={u} x1={p1[0]} y1={p1[1]} x2={p2[0]} y2={p2[1]} stroke={COLORES[i % COLORES.length]} strokeWidth="3" opacity="0.85" />;
-          })}
-        </svg>
+        <div style={{ marginBottom: 16 }}>
+          <FiguraSvg puntos={puntosFigura}>
+            {sala.orden.map((u, i) => {
+              const corte = sala.ultimaRonda.tabla[u];
+              const [p1, p2] = lineaExtendidaVisual(corte.a, corte.b);
+              return <line key={u} x1={p1[0]} y1={p1[1]} x2={p2[0]} y2={p2[1]} stroke={COLORES[i % COLORES.length]} strokeWidth="3" opacity="0.85" />;
+            })}
+          </FiguraSvg>
+        </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 20 }}>
           {ordenados.map((u, i) => {
             const corte = sala.ultimaRonda.tabla[u];
