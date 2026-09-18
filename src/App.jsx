@@ -9,11 +9,12 @@ import RebanarApp from "./rebanar/RebanarApp.jsx";
 import SemaforoApp from "./semaforo/SemaforoApp.jsx";
 import DadosApp from "./dados/DadosApp.jsx";
 import PontePedoApp from "./pontepedo/PontePedoApp.jsx";
+import RocolaApp from "./rocola/RocolaApp.jsx";
 
 const CLAVE_LOCAL = "cah_sesion";
 const LATIDO_MS = 20000;
 
-const JUEGOS_VALIDOS = ["cah", "rebanar", "semaforo", "dados", "pontepedo"];
+const JUEGOS_VALIDOS = ["cah", "rebanar", "semaforo", "dados", "pontepedo", "rocola"];
 
 // Un link de invitación trae el juego (?juego=rebanar) y el código
 // (?codigo=1234). Los links viejos sin "juego" son siempre de CAH, para no
@@ -141,6 +142,10 @@ export default function App() {
 
   if (juego === "pontepedo") {
     return <PontePedoApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} />;
+  }
+
+  if (juego === "rocola") {
+    return <RocolaApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} />;
   }
 
   if (!codigo) {

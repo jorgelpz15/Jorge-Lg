@@ -36,6 +36,13 @@ const JUEGOS = [
     descripcion: "Saca una carta y todos ven el reto que les toca — regla, cascada, nunca nunca, y más.",
     disponible: true,
   },
+  {
+    id: "rocola",
+    emoji: "🎶",
+    nombre: "Rocola",
+    descripcion: "Alguien pone una canción — adivina en qué año salió. Gana quien se acerque más.",
+    disponible: true,
+  },
 ];
 
 export default function SelectorJuegos({ onElegir }) {
