@@ -77,6 +77,7 @@ export async function iniciarJuego(codigo) {
     const snap = await tx.get(ref);
     const sala = snap.data();
     if (sala.fase !== "espera") return;
+    if (Object.keys(sala.jugadores).length < 2) return;
     tx.update(ref, {
       orden: Object.keys(sala.jugadores),
       ronda: 1, fase: "jugando", cancionActual: null, respuestas: {},

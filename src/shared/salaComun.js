@@ -1,4 +1,5 @@
-import { getDoc, updateDoc, serverTimestamp, deleteField } from "firebase/firestore";
+import { getDoc, runTransaction, serverTimestamp, deleteField } from "firebase/firestore";
+import { db } from "../firebase.js";
 
 // generarCodigoUnico/latirPresenciaComun/quitarJugadorTx: extraídos del
 // pathfinder (PATHFINDER-2026-09-09/03-unified-proposal.md, sección 2).
@@ -15,7 +16,13 @@ export async function generarCodigoUnico(salaRef) {
 }
 
 export async function latirPresenciaComun(ref, uid) {
-  await updateDoc(ref, { [`jugadores.${uid}.visto`]: serverTimestamp() });
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists()) return;
+    const sala = snap.data();
+    if (!sala.jugadores?.[uid]) return;
+    tx.update(ref, { [`jugadores.${uid}.visto`]: serverTimestamp() });
+  });
 }
 
 export function quitarJugadorTx(tx, ref, sala, uid, { requiereFase } = {}) {
