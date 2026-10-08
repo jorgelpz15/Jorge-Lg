@@ -61,5 +61,5 @@ export default function SemaforoApp({ uid, onVolverAlMenu, codigoInicial }) {
     );
   }
 
-  return <JuegoSemaforo sala={sala} uid={uid} codigo={codigo} onSalir={handleSalir} onEntrarSala={handleEntrar} />;
+  return <JuegoSemaforo sala={sala} uid={uid} codigo={codigo} onSalir={handleSalir} />;
 }

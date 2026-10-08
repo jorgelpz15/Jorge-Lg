@@ -45,15 +45,24 @@ export async function crearSala(nombre, dificultad, totalRondas, uid) {
   return codigo;
 }
 
-// Desde la pantalla de fin, cualquiera puede armar una revancha con un solo
-// toque: crea una sala nueva (misma dificultad y mismo número de rondas) y
-// avisa en la sala vieja para que a los demás (que siguen viendo la
-// pantalla de resultados) les aparezca el botón para unirse, sin tener que
-// compartir el código a mano otra vez.
-export async function jugarOtraVez(codigoViejo, uid, nombre, dificultad, totalRondas) {
-  const nuevoCodigo = await crearSala(nombre, dificultad, totalRondas, uid);
-  await updateDoc(salaRef(codigoViejo), { salaNueva: nuevoCodigo });
-  return nuevoCodigo;
+// Revancha en la MISMA sala: desde la pantalla de fin, cualquiera la regresa a
+// la sala de espera con los marcadores en cero (misma dificultad y rondas);
+// todos los que siguen dentro vuelven solos, sin cambiar de código.
+export async function jugarOtraVez(codigo) {
+  const ref = salaRef(codigo);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists()) return;
+    const sala = snap.data();
+    if (sala.fase !== "fin") return;
+    const jugadores = {};
+    Object.entries(sala.jugadores).forEach(([u, j]) => {
+      jugadores[u] = { ...j, rondasGanadas: 0, errorTotal: 0 };
+    });
+    tx.update(ref, {
+      jugadores, fase: "espera", orden: [], ronda: 0, figuraActual: null, cortes: {}, ultimaRonda: null,
+    });
+  });
 }
 
 export async function unirseSala(codigo, nombre, uid) {

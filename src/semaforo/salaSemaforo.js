@@ -59,11 +59,24 @@ export async function crearSala(nombre, totalRondas, uid) {
   return codigo;
 }
 
-// Misma revancha con un toque que en A Rebanar / CAH.
-export async function jugarOtraVez(codigoViejo, uid, nombre, totalRondas) {
-  const nuevoCodigo = await crearSala(nombre, totalRondas, uid);
-  await updateDoc(salaRef(codigoViejo), { salaNueva: nuevoCodigo });
-  return nuevoCodigo;
+// Revancha en la MISMA sala: la regresa a la sala de espera con marcadores en
+// cero; todos los que siguen dentro vuelven solos, sin cambiar de código.
+export async function jugarOtraVez(codigo) {
+  const ref = salaRef(codigo);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists()) return;
+    const sala = snap.data();
+    if (sala.fase !== "fin") return;
+    const jugadores = {};
+    Object.entries(sala.jugadores).forEach(([u, j]) => {
+      jugadores[u] = { ...j, rondasGanadas: 0, tiempoTotalMs: 0 };
+    });
+    tx.update(ref, {
+      jugadores, fase: "espera", orden: [], ronda: 0, horaInicio: null, demoraMs: 0,
+      reacciones: {}, ultimaRonda: null,
+    });
+  });
 }
 
 export async function unirseSala(codigo, nombre, uid) {

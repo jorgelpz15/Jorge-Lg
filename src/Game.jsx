@@ -4,7 +4,7 @@ import {
   iniciarEleccionDeInicio, elegirQuienEmpieza, enviarRespuesta, cambiarMano,
   avanzarRevelacion, iniciarVotacion, votar, enviarShot, cerrarShotActivo,
   siguienteRonda, terminarJuego, salirDeSalaEnEspera, otraRondaLibre,
-  jugarOtraVez, unirseSala,
+  jugarOtraVez,
 } from "./sala";
 import ComoSeJuega from "./ComoSeJuega";
 
@@ -61,7 +61,7 @@ function calcularRecomendacion(sala, remitente) {
   return { uid: masSobrio, razon: `Lleva solo ${segundos(masSobrio)}s bebidos — anda muy sobrio para esta hora 🧐` };
 }
 
-export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
+export default function Game({ sala, uid, codigo, onSalir }) {
   const [selected, setSelected] = useState([]);
   const [mostrarRefresh, setMostrarRefresh] = useState(false);
   const [vistaShotMgr, setVistaShotMgr] = useState(false);
@@ -474,19 +474,8 @@ export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
     async function alJugarOtraVez() {
       setCargandoRevancha(true);
       try {
-        const nuevoCodigo = await jugarOtraVez(codigo, uid, yo.nombre);
-        onEntrarSala(nuevoCodigo);
-      } catch {
-        setCargandoRevancha(false);
-      }
-    }
-
-    async function alUnirseARevancha() {
-      setCargandoRevancha(true);
-      try {
-        await unirseSala(sala.salaNueva, yo.nombre, uid);
-        onEntrarSala(sala.salaNueva);
-      } catch {
+        await jugarOtraVez(codigo);
+      } finally {
         setCargandoRevancha(false);
       }
     }
@@ -522,15 +511,9 @@ export default function Game({ sala, uid, codigo, onSalir, onEntrarSala }) {
             })}
           </div>
         </div>
-        {sala.salaNueva ? (
-          <button style={S.btnGold} disabled={cargandoRevancha} onClick={alUnirseARevancha}>
-            {cargandoRevancha ? "Uniendo…" : `🔁 Unirme a la revancha (${sala.salaNueva})`}
-          </button>
-        ) : (
-          <button style={S.btnGold} disabled={cargandoRevancha} onClick={alJugarOtraVez}>
-            {cargandoRevancha ? "Creando…" : "🔁 Jugar otra vez"}
-          </button>
-        )}
+        <button style={S.btnGold} disabled={cargandoRevancha} onClick={alJugarOtraVez}>
+          {cargandoRevancha ? "Reiniciando…" : "🔁 Jugar otra vez"}
+        </button>
         <button style={S.btn} onClick={onSalir}>Salir a inicio</button>
       </div>
     );
