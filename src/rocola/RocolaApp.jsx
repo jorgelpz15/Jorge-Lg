@@ -21,5 +21,5 @@ export default function RocolaApp({ uid, onVolverAlMenu, codigoInicial }) {
       </div>
     );
   }
-  return <JuegoRocola sala={sala} uid={uid} codigo={codigo} onSalir={handleSalir} onEntrarSala={handleEntrar} />;
+  return <JuegoRocola sala={sala} uid={uid} codigo={codigo} onSalir={handleSalir} />;
 }

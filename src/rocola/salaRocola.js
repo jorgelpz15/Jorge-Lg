@@ -1,5 +1,5 @@
 import {
-  doc, setDoc, onSnapshot, runTransaction, serverTimestamp, updateDoc,
+  doc, setDoc, onSnapshot, runTransaction, serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../firebase.js";
 import { generarCodigoUnico, latirPresenciaComun, quitarJugadorTx } from "../shared/salaComun.js";
@@ -170,8 +170,22 @@ export async function avanzar(codigo) {
   });
 }
 
-export async function jugarOtraVez(codigoViejo, uid, nombre, totalRondas) {
-  const nuevoCodigo = await crearSala(nombre, totalRondas, uid);
-  await updateDoc(salaRef(codigoViejo), { salaNueva: nuevoCodigo });
-  return nuevoCodigo;
+// Revancha en la MISMA sala: todos los que siguen dentro vuelven solos a la
+// sala de espera (por el listener) con marcadores en cero.
+export async function jugarOtraVez(codigo) {
+  const ref = salaRef(codigo);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists()) return;
+    const sala = snap.data();
+    if (sala.fase !== "fin") return;
+    const jugadores = {};
+    Object.entries(sala.jugadores).forEach(([u, j]) => {
+      jugadores[u] = { ...j, rondasGanadas: 0, errorTotal: 0 };
+    });
+    tx.update(ref, {
+      jugadores, orden: [], ronda: 0, fase: "espera",
+      cancionActual: null, respuestas: {}, ultimaRonda: null, cancionesUsadas: [],
+    });
+  });
 }
