@@ -109,14 +109,16 @@ export default function SelectorJuegos({ onElegir }) {
       </button>
       <div style={{ marginTop: 28, textAlign: "center" }}>
         <p style={{ color: "#8a8a8a", fontSize: 12, margin: 0 }}>
-          Desarrollado por <strong style={{ color: "#ffd700", fontWeight: 800 }}>{MARCA_NOMBRE}</strong>
+          Desarrollado por{" "}
+          {whatsapp ? (
+            <a href={whatsapp} target="_blank" rel="noreferrer" aria-label={`${MARCA_NOMBRE}, escribir por WhatsApp`}
+              style={{ display: "inline-block", padding: "14px 4px", color: "#ffd700", fontWeight: 800, textDecoration: "underline", textUnderlineOffset: 3 }}>
+              {MARCA_NOMBRE}
+            </a>
+          ) : (
+            <strong style={{ color: "#ffd700", fontWeight: 800 }}>{MARCA_NOMBRE}</strong>
+          )}
         </p>
-        {whatsapp && (
-          <a href={whatsapp} target="_blank" rel="noreferrer"
-            style={{ display: "inline-block", marginTop: 10, padding: "12px 18px", minHeight: 44, boxSizing: "border-box", color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none", background: "#1a1a1a", border: "1px solid #333", borderRadius: 10 }}>
-            💬 ¿Quieres una app así? Escríbeme
-          </a>
-        )}
       </div>
       <p style={{ color: "#8a8a8a", fontSize: 10, marginTop: 20 }}>v{__APP_VERSION__}</p>
     </div>
