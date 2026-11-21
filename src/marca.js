@@ -1,5 +1,5 @@
 // Datos de marca del hub. Cambiar aquí el nombre o el número y se actualiza el pie del menú.
-export const MARCA_NOMBRE = "Mesa Chueca";
+export const MARCA_NOMBRE = "FulmIA Studio";
 // WhatsApp con código de país y sin signos ni espacios, p. ej. "5215512345678". Vacío = no se muestra el botón.
 export const WHATSAPP_NUMERO = "524497698573";
 export const WHATSAPP_MENSAJE = "Hola, vi Juegos con Amigos y me interesa algo así / quiero platicar.";
