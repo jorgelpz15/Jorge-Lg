@@ -3,6 +3,7 @@ import { esperarMiUid, configuracionValida } from "./firebase";
 import { escucharSala, latirPresencia } from "./sala";
 import { S } from "./styles";
 import SelectorJuegos from "./SelectorJuegos";
+import CargandoDado from "./CargandoDado";
 import Lobby from "./Lobby";
 import Game from "./Game";
 import RebanarApp from "./rebanar/RebanarApp.jsx";
@@ -119,7 +120,7 @@ export default function App() {
   if (!uid) {
     return (
       <div style={S.page}>
-        <p style={{ color: "#7a7a7a", fontSize: 13 }}>Cargando…</p>
+        <CargandoDado />
       </div>
     );
   }

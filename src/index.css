@@ -76,6 +76,25 @@ input:focus-visible {
   animation: fade-in-fast 0.15s ease-out;
 }
 
+/* Pantalla de carga: el dado del logo rebota suave y suelta destellos. */
+@keyframes dado-flota {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-8px) rotate(4deg); }
+}
+@keyframes destello {
+  0%, 100% { transform: scale(0) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1) rotate(45deg); opacity: 1; }
+}
+.cargando-dado {
+  display: block;
+  filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.35));
+  animation: dado-flota 1.4s ease-in-out infinite;
+}
+.cargando-destello {
+  position: absolute;
+  animation: destello 1.6s ease-in-out infinite;
+}
+
 /* El juego usa transiciones cortas (selección de carta, presionar botón).
    Quien pida menos movimiento las recibe casi instantáneas, sin animar. */
 @media (prefers-reduced-motion: reduce) {
@@ -86,4 +105,6 @@ input:focus-visible {
   button:active {
     transform: none;
   }
+  .cargando-dado { animation: none !important; }
+  .cargando-destello { animation: none !important; opacity: 0.8; transform: scale(0.7); }
 }
