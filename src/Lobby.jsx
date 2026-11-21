@@ -4,6 +4,7 @@ import { WHITE_CARDS, BLACK_CARDS } from "./gameData";
 import { WHITE_CARDS_EN, BLACK_CARDS_EN } from "./gameDataEn";
 import { crearSala, unirseSala } from "./sala";
 import { MENSAJES_ERROR_TURNO as MENSAJES_ERROR } from "./mensajesError";
+import InvitacionJuego from "./InvitacionJuego";
 
 export default function Lobby({ uid, onEntrar, codigoInicial, onVolverAlMenu }) {
   const [pantalla, setPantalla] = useState(codigoInicial ? "unir" : "home");
@@ -90,6 +91,7 @@ export default function Lobby({ uid, onEntrar, codigoInicial, onVolverAlMenu }) 
 
   if (pantalla === "unir") return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
+      {codigoInicial && <InvitacionJuego emoji="🍆" nombre="Cartas Contra la Humanidad" />}
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Unirme a una sala</h2>
       <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>
         {codigoInicial ? "Te invitaron a esta partida — solo falta tu nombre" : "Pide el código de 4 dígitos a quien creó la sala"}

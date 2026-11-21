@@ -2,6 +2,7 @@ import { useState } from "react";
 import { S } from "../styles.js";
 import { crearSala, unirseSala, iniciarJuego, OPCIONES_RONDAS } from "./salaRebanar.js";
 import { MENSAJES_ERROR_TURNO as MENSAJES_ERROR } from "../mensajesError.js";
+import InvitacionJuego from "../InvitacionJuego.jsx";
 
 export default function LobbyRebanar({ uid, onEntrar, onVolverAlMenu, codigoInicial }) {
   const [pantalla, setPantalla] = useState(codigoInicial ? "unir" : "home");
@@ -96,6 +97,7 @@ export default function LobbyRebanar({ uid, onEntrar, onVolverAlMenu, codigoInic
 
   if (pantalla === "unir") return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
+      {codigoInicial && <InvitacionJuego emoji="🔪" nombre="A Rebanar" />}
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Unirme a una sala</h2>
       <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>
         {codigoInicial ? "Te invitaron a esta partida — solo falta tu nombre" : "Pide el código de 4 dígitos a quien creó la sala"}
