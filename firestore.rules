@@ -1,35 +1,42 @@
 rules_version = '2';
 
-// Reglas simples pensadas para un juego casual entre amigos: cualquiera que
-// entre a la página (que se autentica de forma anónima automáticamente) y
-// conozca el código de 4 dígitos de la sala puede leer y escribir esa sala.
-// No hay datos sensibles en juego (nombres y cartas de un juego de fiesta),
-// así que se prioriza simplicidad sobre reglas finas por jugador.
+// Juego casual entre amigos: cualquiera que entre a la página (se autentica
+// de forma anónima automáticamente) y conozca el código de 4 dígitos de la
+// sala puede leer y escribir esa sala; la lógica del juego corre en los
+// celulares, así que no se puede restringir qué campo toca cada jugador sin
+// romper las partidas. Lo que SÍ se cierra:
+//   - listar/recorrer las salas (solo se puede leer una sala si sabes su código)
+//   - borrar salas (la app nunca borra; las viejas se limpian con TTL sobre `creadaEn`)
+//   - pasarse del tope de jugadores de cada juego (8, o 12 en Dados y Ponte Pedo)
 service cloud.firestore {
   match /databases/{database}/documents {
+    function logueado() { return request.auth != null; }
+    function codigoValido(c) { return c.matches('^[0-9]{4}$'); }
+    function maxJugadores(n) { return request.resource.data.jugadores.size() <= n; }
+
     match /salas/{codigo} {
-      allow read, write: if request.auth != null
-                          && codigo.matches('^[0-9]{4}$');
+      allow get: if logueado() && codigoValido(codigo);
+      allow create, update: if logueado() && codigoValido(codigo) && maxJugadores(8);
     }
     match /salasRebanar/{codigo} {
-      allow read, write: if request.auth != null
-                          && codigo.matches('^[0-9]{4}$');
+      allow get: if logueado() && codigoValido(codigo);
+      allow create, update: if logueado() && codigoValido(codigo) && maxJugadores(8);
     }
     match /salasSemaforo/{codigo} {
-      allow read, write: if request.auth != null
-                          && codigo.matches('^[0-9]{4}$');
+      allow get: if logueado() && codigoValido(codigo);
+      allow create, update: if logueado() && codigoValido(codigo) && maxJugadores(8);
     }
     match /salasDados/{codigo} {
-      allow read, write: if request.auth != null
-                          && codigo.matches('^[0-9]{4}$');
+      allow get: if logueado() && codigoValido(codigo);
+      allow create, update: if logueado() && codigoValido(codigo) && maxJugadores(12);
     }
     match /salasPontePedo/{codigo} {
-      allow read, write: if request.auth != null
-                          && codigo.matches('^[0-9]{4}$');
+      allow get: if logueado() && codigoValido(codigo);
+      allow create, update: if logueado() && codigoValido(codigo) && maxJugadores(12);
     }
     match /salasRocola/{codigo} {
-      allow read, write: if request.auth != null
-                          && codigo.matches('^[0-9]{4}$');
+      allow get: if logueado() && codigoValido(codigo);
+      allow create, update: if logueado() && codigoValido(codigo) && maxJugadores(8);
     }
   }
 }
