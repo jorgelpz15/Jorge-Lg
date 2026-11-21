@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { S } from "./styles";
 
 const JUEGOS = [
@@ -46,6 +47,26 @@ const JUEGOS = [
 ];
 
 export default function SelectorJuegos({ onElegir }) {
+  const [copiado, setCopiado] = useState(false);
+
+  async function compartirApp() {
+    const url = location.origin;
+    const texto = "¡Juega conmigo! Cartas Contra la Humanidad, A Rebanar, Rocola y más, cada quien desde su celular.";
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "Juegos con Amigos", text: texto, url });
+        return;
+      } catch (e) {
+        if (e.name === "AbortError") return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(`${texto} ${url}`);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch { /* sin permiso de portapapeles, no pasa nada grave */ }
+  }
+
   return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "48px 20px" }}>
       <h1 style={{ fontSize: 30, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 4px" }}>Juegos con amigos</h1>
@@ -81,7 +102,10 @@ export default function SelectorJuegos({ onElegir }) {
           </button>
         ))}
       </div>
-      <p style={{ color: "#7a7a7a", fontSize: 10, marginTop: 32 }}>v{__APP_VERSION__}</p>
+      <button style={{ ...S.navBtn, width: "100%", maxWidth: 380, marginTop: 20, color: "#ffd700" }} onClick={compartirApp}>
+        <span key={copiado} className="fade-rise">{copiado ? "¡Link copiado! ✓" : "📤 Compartir esta app"}</span>
+      </button>
+      <p style={{ color: "#7a7a7a", fontSize: 10, marginTop: 24 }}>v{__APP_VERSION__}</p>
     </div>
   );
 }
