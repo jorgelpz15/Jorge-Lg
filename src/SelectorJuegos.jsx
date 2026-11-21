@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { S } from "./styles";
+import { MARCA_NOMBRE, linkWhatsApp } from "./marca";
 
 const JUEGOS = [
   {
@@ -47,6 +48,7 @@ const JUEGOS = [
 ];
 
 export default function SelectorJuegos({ onElegir }) {
+  const whatsapp = linkWhatsApp();
   const [copiado, setCopiado] = useState(false);
 
   async function compartirApp() {
@@ -105,7 +107,18 @@ export default function SelectorJuegos({ onElegir }) {
       <button style={{ ...S.navBtn, width: "100%", maxWidth: 380, marginTop: 20, color: "#ffd700" }} onClick={compartirApp}>
         <span key={copiado} className="fade-rise">{copiado ? "¡Link copiado! ✓" : "📤 Compartir esta app"}</span>
       </button>
-      <p style={{ color: "#7a7a7a", fontSize: 10, marginTop: 24 }}>v{__APP_VERSION__}</p>
+      <div style={{ marginTop: 28, textAlign: "center" }}>
+        <p style={{ color: "#8a8a8a", fontSize: 12, margin: 0 }}>
+          Desarrollado por <strong style={{ color: "#ffd700", fontWeight: 800 }}>{MARCA_NOMBRE}</strong>
+        </p>
+        {whatsapp && (
+          <a href={whatsapp} target="_blank" rel="noreferrer"
+            style={{ display: "inline-block", marginTop: 10, padding: "12px 18px", minHeight: 44, boxSizing: "border-box", color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none", background: "#1a1a1a", border: "1px solid #333", borderRadius: 10 }}>
+            💬 ¿Quieres una app así? Escríbeme
+          </a>
+        )}
+      </div>
+      <p style={{ color: "#8a8a8a", fontSize: 10, marginTop: 20 }}>v{__APP_VERSION__}</p>
     </div>
   );
 }
