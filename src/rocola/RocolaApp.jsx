@@ -3,6 +3,7 @@ import { escucharSala, latirPresencia } from "./salaRocola.js";
 import { useSalaSession } from "../shared/useSalaSession.js";
 import LobbyRocola from "./LobbyRocola.jsx";
 import JuegoRocola from "./JuegoRocola.jsx";
+import CargandoDado from "../CargandoDado.jsx";
 
 const CLAVE_LOCAL = "rocola_sesion";
 
@@ -17,7 +18,7 @@ export default function RocolaApp({ uid, onVolverAlMenu, codigoInicial }) {
   if (!sala) {
     return (
       <div style={S.page}>
-        <p style={{ color: "#7a7a7a", fontSize: 13 }}>Entrando a la sala…</p>
+        <CargandoDado texto="Entrando a la sala…" />
       </div>
     );
   }

@@ -3,7 +3,6 @@ import { esperarMiUid, configuracionValida } from "./firebase";
 import { escucharSala, latirPresencia } from "./sala";
 import { S } from "./styles";
 import SelectorJuegos from "./SelectorJuegos";
-import CargandoDado from "./CargandoDado";
 import Lobby from "./Lobby";
 import Game from "./Game";
 import RebanarApp from "./rebanar/RebanarApp.jsx";
@@ -11,6 +10,7 @@ import SemaforoApp from "./semaforo/SemaforoApp.jsx";
 import DadosApp from "./dados/DadosApp.jsx";
 import PontePedoApp from "./pontepedo/PontePedoApp.jsx";
 import RocolaApp from "./rocola/RocolaApp.jsx";
+import CargandoDado from "./CargandoDado";
 
 const CLAVE_LOCAL = "cah_sesion";
 const LATIDO_MS = 20000;
@@ -156,7 +156,7 @@ export default function App() {
   if (!sala) {
     return (
       <div style={S.page}>
-        <p style={{ color: "#7a7a7a", fontSize: 13 }}>Entrando a la sala…</p>
+        <CargandoDado texto="Entrando a la sala…" />
       </div>
     );
   }

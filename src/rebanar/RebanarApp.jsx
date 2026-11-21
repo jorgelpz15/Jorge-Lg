@@ -3,6 +3,7 @@ import { S } from "../styles.js";
 import { escucharSala, latirPresencia } from "./salaRebanar.js";
 import LobbyRebanar from "./LobbyRebanar.jsx";
 import JuegoRebanar from "./JuegoRebanar.jsx";
+import CargandoDado from "../CargandoDado.jsx";
 
 const CLAVE_LOCAL = "rebanar_sesion";
 const LATIDO_MS = 20000;
@@ -56,7 +57,7 @@ export default function RebanarApp({ uid, onVolverAlMenu, codigoInicial }) {
   if (!sala) {
     return (
       <div style={S.page}>
-        <p style={{ color: "#7a7a7a", fontSize: 13 }}>Entrando a la sala…</p>
+        <CargandoDado texto="Entrando a la sala…" />
       </div>
     );
   }

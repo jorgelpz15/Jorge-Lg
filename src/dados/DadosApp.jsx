@@ -3,6 +3,7 @@ import { S } from "../styles.js";
 import { escucharSala, latirPresencia } from "./salaDados.js";
 import LobbyDados from "./LobbyDados.jsx";
 import PantallaDados from "./PantallaDados.jsx";
+import CargandoDado from "../CargandoDado.jsx";
 
 const CLAVE_LOCAL = "dados_sesion";
 const LATIDO_MS = 20000;
@@ -56,7 +57,7 @@ export default function DadosApp({ uid, onVolverAlMenu, codigoInicial }) {
   if (!sala) {
     return (
       <div style={S.page}>
-        <p style={{ color: "#7a7a7a", fontSize: 13 }}>Entrando a la sala…</p>
+        <CargandoDado texto="Entrando a la sala…" />
       </div>
     );
   }

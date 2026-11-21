@@ -4,6 +4,7 @@ import { escucharSala, latirPresencia } from "./salaPontePedo.js";
 import LobbyPontePedo from "./LobbyPontePedo.jsx";
 import PantallaPontePedo from "./PantallaPontePedo.jsx";
 import PantallaPontePedoSolo from "./PantallaPontePedoSolo.jsx";
+import CargandoDado from "../CargandoDado.jsx";
 
 const CLAVE_LOCAL = "pontepedo_sesion";
 const LATIDO_MS = 20000;
@@ -65,7 +66,7 @@ export default function PontePedoApp({ uid, onVolverAlMenu, codigoInicial }) {
   if (!sala) {
     return (
       <div style={S.page}>
-        <p style={{ color: "#7a7a7a", fontSize: 13 }}>Entrando a la sala…</p>
+        <CargandoDado texto="Entrando a la sala…" />
       </div>
     );
   }
