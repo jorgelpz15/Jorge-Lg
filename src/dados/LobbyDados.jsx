@@ -50,7 +50,7 @@ export default function LobbyDados({ uid, onEntrar, onVolverAlMenu, codigoInicia
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{ fontSize: 52, marginBottom: 4 }}>🎲</div>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: "#fff", margin: 0 }}>Dados</h1>
-          <p style={{ color: "#7a7a7a", fontSize: 12, marginTop: 8 }}>tira los dados y todos ven el mismo resultado, al mismo tiempo</p>
+          <p style={{ color: "#8a8a8a", fontSize: 12, marginTop: 8 }}>tira los dados y todos ven el mismo resultado, al mismo tiempo</p>
         </div>
         <button style={{ ...S.btn, marginBottom: 12 }} onClick={() => abrirCrear(true)}>🕹️ Jugar solo</button>
         <button style={{ ...S.btnGold, marginBottom: 12 }} onClick={() => abrirCrear(false)}>Crear sala</button>
@@ -63,7 +63,7 @@ export default function LobbyDados({ uid, onEntrar, onVolverAlMenu, codigoInicia
   if (pantalla === "crear") return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>{solo ? "Jugar solo" : "Crear sala"}</h2>
-      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>{solo ? "Practica tú solo, a tu ritmo" : "Tú serás el anfitrión"}</p>
+      <p style={{ color: "#8a8a8a", fontSize: 13, margin: "0 0 20px" }}>{solo ? "Practica tú solo, a tu ritmo" : "Tú serás el anfitrión"}</p>
       <label style={S.fieldLabel} htmlFor="nombre-crear-d">Tu nombre</label>
       <input id="nombre-crear-d" style={{ ...S.input, width: "100%", marginBottom: 16 }} placeholder="Ej. Jorge" value={nombre}
         onChange={(e) => setNombre(e.target.value)} maxLength={12} />
@@ -79,7 +79,7 @@ export default function LobbyDados({ uid, onEntrar, onVolverAlMenu, codigoInicia
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
       {codigoInicial && <InvitacionJuego emoji="🎲" nombre="Dados" />}
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Unirme a una sala</h2>
-      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>
+      <p style={{ color: "#8a8a8a", fontSize: 13, margin: "0 0 20px" }}>
         {codigoInicial ? "Te invitaron a esta partida — solo falta tu nombre" : "Pide el código de 4 dígitos a quien creó la sala"}
       </p>
       <label style={S.fieldLabel} htmlFor="nombre-unir-d">Tu nombre</label>

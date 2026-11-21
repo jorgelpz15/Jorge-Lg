@@ -1,12 +1,15 @@
-// Presencia compartida: si el jugador no ha mandado un heartbeat en los
-// últimos 45s, se considera desconectado. Usado por Rocola; los otros 5
-// juegos del hub tienen su propia copia idéntica (ver
-// PATHFINDER-2026-09-09/02-duplication-report.md, item 1) — no se tocan en
-// este plan.
-export const MARGEN_DESCONEXION_MS = 45000;
+// Presencia compartida por los 6 juegos. Cada celular manda un latido cada
+// LATIDO_MS (y se pausa con la pantalla apagada o la pestaña oculta, ver
+// useLatido); si pasa más de MARGEN_DESCONEXION_MS sin latido, se muestra
+// como desconectado. 60 s / 150 s bajan ~3x las lecturas de Firestore frente
+// a los 20 s / 45 s anteriores (cada latido se reenvía a todos los listeners).
+export const LATIDO_MS = 60000;
+export const MARGEN_DESCONEXION_MS = 150000;
+// Para armar una revancha solo se conservan jugadores con latido reciente.
+export const MARGEN_REVANCHA_MS = 100000;
 
-export function estaConectado(visto, ahora) {
+export function estaConectado(visto, ahora, margen = MARGEN_DESCONEXION_MS) {
   if (!visto) return true;
   const ms = typeof visto.toMillis === "function" ? visto.toMillis() : 0;
-  return ahora - ms < MARGEN_DESCONEXION_MS;
+  return ahora - ms < margen;
 }

@@ -1,18 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { S } from "../styles.js";
 import {
-  avanzar, enviarReaccion, iniciarJuego, jugarOtraVez, salirDeSalaEnEspera,
+  avanzar, enviarReaccion, iniciarJuego, jugarOtraVez, salirDeSala, salirDeSalaEnEspera,
   NUM_LUCES, MS_ENTRE_LUCES,
 } from "./salaSemaforo.js";
 import ComoSeJuega from "../ComoSeJuega.jsx";
-
-const MARGEN_DESCONEXION_MS = 45000;
-
-function estaConectado(visto, ahora) {
-  if (!visto) return true;
-  const ms = typeof visto.toMillis === "function" ? visto.toMillis() : 0;
-  return ahora - ms < MARGEN_DESCONEXION_MS;
-}
+import { estaConectado } from "../shared/presencia.js";
+import BotonSalir from "../shared/BotonSalir.jsx";
 
 export default function JuegoSemaforo({ sala, uid, codigo, onSalir }) {
   const [ahora, setAhora] = useState(() => Date.now());
@@ -33,13 +27,16 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir }) {
   // Cada ronda nueva programa su propia secuencia de luces a partir de la
   // hora de inicio que guardó el servidor, para que todos los celulares
   // arranquen del mismo punto.
+  // Depende del valor en milisegundos, no del objeto Timestamp: cada snapshot
+  // (latidos, reacciones de otros) trae un objeto nuevo y reiniciaría la secuencia.
+  const horaInicioMs = sala.horaInicio ? sala.horaInicio.toMillis() : null;
   useEffect(() => {
     setLucesEncendidas(0);
     setApagadas(false);
     setYaToque(false);
     lucesOffMsRef.current = null;
-    if (sala.fase !== "jugando" || !sala.horaInicio) return;
-    const inicioMs = sala.horaInicio.toMillis();
+    if (sala.fase !== "jugando" || horaInicioMs === null) return;
+    const inicioMs = horaInicioMs;
     const lucesOffMs = inicioMs + NUM_LUCES * MS_ENTRE_LUCES + sala.demoraMs;
     lucesOffMsRef.current = lucesOffMs;
     const timers = [];
@@ -49,7 +46,7 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir }) {
     }
     timers.push(setTimeout(() => setApagadas(true), Math.max(0, lucesOffMs - Date.now())));
     return () => timers.forEach(clearTimeout);
-  }, [sala.fase, sala.ronda, sala.horaInicio, sala.demoraMs]);
+  }, [sala.fase, sala.ronda, horaInicioMs, sala.demoraMs]);
 
   const yo = sala.jugadores[uid];
   const nombre = (u) => sala.jugadores[u]?.nombre || "?";
@@ -67,13 +64,6 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir }) {
       setCopiado(true);
       setTimeout(() => setCopiado(false), 2000);
     } catch { /* el navegador no dio permiso de portapapeles, no pasa nada grave */ }
-  }
-
-  function BotonSalir() {
-    return (
-      <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer", marginTop: 18 }}
-        onClick={() => setConfirmarSalida(true)}>Salir de la sala</button>
-    );
   }
 
   function alTocar() {
@@ -111,7 +101,7 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir }) {
     const conectados = entradas.filter(([, j]) => estaConectado(j.visto, ahora)).length;
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
-        <p style={{ color: "#7a7a7a", fontSize: 12, letterSpacing: 3, textTransform: "uppercase", textAlign: "center", margin: "0 0 4px" }}>Código de la sala</p>
+        <p style={{ color: "#8a8a8a", fontSize: 12, letterSpacing: 3, textTransform: "uppercase", textAlign: "center", margin: "0 0 4px" }}>Código de la sala</p>
         <div style={{ ...S.codeBox, alignSelf: "center" }}>{sala.codigo}</div>
         <p style={{ color: "#ffd700", fontSize: 12, textAlign: "center", margin: "0 0 16px" }}>{sala.totalRondas} rondas</p>
         <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", marginBottom: 20 }}
@@ -123,7 +113,7 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir }) {
             return (
               <div key={u} style={{ ...S.chip, justifyContent: "space-between", opacity: online ? 1 : 0.5 }}>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>
-                  <span style={{ color: online ? "#4caf50" : "#7a7a7a" }}>●</span> {j.nombre}
+                  <span style={{ color: online ? "#4caf50" : "#8a8a8a" }}>●</span> {j.nombre}
                   {u === sala.anfitrion && " 👑"}
                 </span>
                 {!online && <span style={{ color: "#888", fontSize: 11 }}>desconectado</span>}
@@ -133,8 +123,8 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir }) {
         </div>
         <ComoSeJuega storageKey="semaforo_reglas_vistas" texto="Espera a que se apaguen TODAS las luces antes de tocar la pantalla. Tocar antes de tiempo = salida en falso, y cuenta como el peor tiempo posible de la ronda. Gana quien reaccione más rápido sin adelantarse." />
         <button style={S.btn} onClick={() => iniciarJuego(codigo)}>¡ARMAR JUEGO! ({entradas.length})</button>
-        {entradas.length < 2 && <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", marginTop: 8 }}>Puedes jugar solo para practicar, o esperar a que se unan más amigos</p>}
-        <div style={{ textAlign: "center" }}><BotonSalir /></div>
+        {entradas.length < 2 && <p style={{ color: "#8a8a8a", fontSize: 12, textAlign: "center", marginTop: 8 }}>Puedes jugar solo para practicar, o esperar a que se unan más amigos</p>}
+        <div style={{ textAlign: "center" }}><BotonSalir onClick={() => setConfirmarSalida(true)} /></div>
       </div>
     );
   }
@@ -165,7 +155,7 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir }) {
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px", background: fondo }}>
         <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 320, margin: "0 auto 10px" }}>
-          <span style={{ background: "#222", color: "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Ronda {sala.ronda}/{sala.totalRondas}</span>
+          <span style={{ background: "#222", color: "#888", fontSize: 12, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Ronda {sala.ronda}/{sala.totalRondas}</span>
           <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>{yo.nombre}</span>
         </div>
         {/* Zona de toque: solo aquí cuenta como reacción, para no chocar con
@@ -185,11 +175,11 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir }) {
             ))}
           </div>
           <p key={apagadas ? "on" : "off"} className={apagadas ? "pop-in" : ""}
-            style={{ color: apagadas ? "#fff" : "#7a7a7a", fontSize: apagadas ? 22 : 14, fontWeight: apagadas ? 900 : 400, textAlign: "center", margin: 0 }}>
+            style={{ color: apagadas ? "#fff" : "#8a8a8a", fontSize: apagadas ? 22 : 14, fontWeight: apagadas ? 900 : 400, textAlign: "center", margin: 0 }}>
             {apagadas ? "¡TOCA AHORA!" : "Espera a que se apaguen las luces…"}
           </p>
         </div>
-        <div style={{ textAlign: "center" }}><BotonSalir /></div>
+        <div style={{ textAlign: "center" }}><BotonSalir onClick={() => setConfirmarSalida(true)} /></div>
       </div>
     );
   }
@@ -225,7 +215,7 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir }) {
         <button style={S.btnGold} onClick={() => avanzar(codigo)}>
           {sala.ronda >= sala.totalRondas ? "Ver resultado final →" : "Siguiente ronda →"}
         </button>
-        <div style={{ textAlign: "center" }}><BotonSalir /></div>
+        <div style={{ textAlign: "center" }}><BotonSalir onClick={() => setConfirmarSalida(true)} /></div>
       </div>
     );
   }
@@ -238,10 +228,17 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir }) {
       return (j1.tiempoTotalMs || 0) - (j2.tiempoTotalMs || 0);
     });
 
+    async function salirDelFin() {
+      // Salir de verdad (no solo cerrar la sesión local), para no dejar un
+      // jugador fantasma si el grupo arma una revancha.
+      try { await salirDeSala(codigo, uid); } catch { /* sin red: igual lo sacamos de la pantalla */ }
+      onSalir();
+    }
+
     async function alJugarOtraVez() {
       setCargandoRevancha(true);
       try {
-        await jugarOtraVez(codigo);
+        await jugarOtraVez(codigo, uid);
       } finally {
         setCargandoRevancha(false);
       }
@@ -254,7 +251,7 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir }) {
           <h1 className="fade-rise" style={{ fontSize: 28, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>
             {sala.orden.length > 1 ? `¡${nombre(ordenados[0])} reacciona más rápido!` : "¡Terminaste la práctica!"}
           </h1>
-          <p style={{ color: "#7a7a7a", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>
+          <p style={{ color: "#8a8a8a", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 5, width: "100%" }}>
           {ordenados.map((u, i) => (
@@ -262,14 +259,14 @@ export default function JuegoSemaforo({ sala, uid, codigo, onSalir }) {
               <span style={{ fontSize: 18, width: 28, textAlign: "center" }}>{i === 0 ? "👑" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}</span>
               <span style={{ flex: 1, fontSize: 15, fontWeight: 700, color: "#fff" }}>{sala.jugadores[u].nombre}</span>
               <span style={{ fontSize: 13, color: "#ffd700", fontWeight: 700 }}>{sala.jugadores[u].rondasGanadas} rondas</span>
-              <span style={{ fontSize: 11, color: "#7a7a7a" }}>{sala.jugadores[u].tiempoTotalMs || 0} ms total</span>
+              <span style={{ fontSize: 12, color: "#8a8a8a" }}>{sala.jugadores[u].tiempoTotalMs || 0} ms total</span>
             </div>
           ))}
         </div>
         <button style={S.btnGold} disabled={cargandoRevancha} onClick={alJugarOtraVez}>
           {cargandoRevancha ? "Reiniciando…" : "🔁 Jugar otra vez"}
         </button>
-        <button style={S.btn} onClick={onSalir}>Salir a inicio</button>
+        <button style={S.btn} onClick={salirDelFin}>Salir a inicio</button>
       </div>
     );
   }

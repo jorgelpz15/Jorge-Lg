@@ -53,7 +53,7 @@ export default function LobbyRebanar({ uid, onEntrar, onVolverAlMenu, codigoInic
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{ fontSize: 52, marginBottom: 4 }}>🔪</div>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: "#fff", margin: 0 }}>A Rebanar</h1>
-          <p style={{ color: "#7a7a7a", fontSize: 12, marginTop: 8 }}>corta lo más cerca posible del % que te toque</p>
+          <p style={{ color: "#8a8a8a", fontSize: 12, marginTop: 8 }}>corta lo más cerca posible del % que te toque</p>
         </div>
         <button style={{ ...S.btn, marginBottom: 12 }} onClick={() => abrirCrear(true)}>🕹️ Jugar solo</button>
         <button style={{ ...S.btnGold, marginBottom: 12 }} onClick={() => abrirCrear(false)}>Crear sala</button>
@@ -66,7 +66,7 @@ export default function LobbyRebanar({ uid, onEntrar, onVolverAlMenu, codigoInic
   if (pantalla === "crear") return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>{solo ? "Jugar solo" : "Crear sala"}</h2>
-      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>{solo ? "Practica tú solo, a tu ritmo" : "Tú serás el anfitrión de la partida"}</p>
+      <p style={{ color: "#8a8a8a", fontSize: 13, margin: "0 0 20px" }}>{solo ? "Practica tú solo, a tu ritmo" : "Tú serás el anfitrión de la partida"}</p>
       <label style={S.fieldLabel} htmlFor="nombre-crear-r">Tu nombre</label>
       <input id="nombre-crear-r" style={{ ...S.input, width: "100%", marginBottom: 16 }} placeholder="Ej. Jorge" value={nombre}
         onChange={(e) => setNombre(e.target.value)} maxLength={12} />
@@ -74,9 +74,9 @@ export default function LobbyRebanar({ uid, onEntrar, onVolverAlMenu, codigoInic
         <p style={{ color: "#888", fontSize: 13, margin: "0 0 8px" }}>✋ Cómo se corta:</p>
         <div style={{ display: "flex", gap: 8 }}>
           <button style={{ ...S.nameBtn, flex: 1, fontSize: 13, ...(dificultad === "deslizar" ? { background: "#ffd700", color: "#000", border: "1px solid #ffd700" } : {}) }}
-            onClick={() => setDificultad("deslizar")}>👆 Deslizar<br /><span style={{ fontSize: 10, fontWeight: 400, opacity: 0.8 }}>un solo trazo, más difícil</span></button>
+            onClick={() => setDificultad("deslizar")}>👆 Deslizar<br /><span style={{ fontSize: 12, fontWeight: 400, opacity: 0.8 }}>un solo trazo, más difícil</span></button>
           <button style={{ ...S.nameBtn, flex: 1, fontSize: 13, ...(dificultad === "linea" ? { background: "#ffd700", color: "#000", border: "1px solid #ffd700" } : {}) }}
-            onClick={() => setDificultad("linea")}>📏 Línea<br /><span style={{ fontSize: 10, fontWeight: 400, opacity: 0.8 }}>ajustable, más fácil</span></button>
+            onClick={() => setDificultad("linea")}>📏 Línea<br /><span style={{ fontSize: 12, fontWeight: 400, opacity: 0.8 }}>ajustable, más fácil</span></button>
         </div>
       </div>
       <div style={{ marginBottom: 24 }}>
@@ -99,7 +99,7 @@ export default function LobbyRebanar({ uid, onEntrar, onVolverAlMenu, codigoInic
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
       {codigoInicial && <InvitacionJuego emoji="🔪" nombre="A Rebanar" />}
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Unirme a una sala</h2>
-      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>
+      <p style={{ color: "#8a8a8a", fontSize: 13, margin: "0 0 20px" }}>
         {codigoInicial ? "Te invitaron a esta partida — solo falta tu nombre" : "Pide el código de 4 dígitos a quien creó la sala"}
       </p>
       <label style={S.fieldLabel} htmlFor="nombre-unir-r">Tu nombre</label>

@@ -7,6 +7,7 @@ import {
 import { db } from "./firebase";
 import { shuffle } from "./gameData";
 import { mazosPara } from "./idiomas";
+import { salirDeSalaComun, jugadoresParaRevancha, latirPresenciaComun } from "./shared/salaComun.js";
 
 const MANO_INICIAL = 10;
 
@@ -56,25 +57,30 @@ export async function crearSala(nombre, shotsParaDesbloquear, uid, idioma) {
 }
 
 // Revancha en la MISMA sala: desde la pantalla de fin, cualquiera la regresa a
-// la sala de espera con los marcadores en cero; todos los que siguen dentro
-// (listener de Firestore) vuelven solos, sin cambiar de código.
-export async function jugarOtraVez(codigo) {
+// la sala de espera con los marcadores en cero; siguen solo los jugadores
+// conectados y todos los que están viendo la sala vuelven solos (listener).
+export async function jugarOtraVez(codigo, uid) {
   const ref = salaRef(codigo);
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(ref);
     if (!snap.exists()) return;
     const sala = snap.data();
-    if (sala.fase !== "fin") return;
+    if (sala.fase !== "fin" || !sala.jugadores[uid]) return;
+    const { jugadores: quedan, anfitrion } = jugadoresParaRevancha(sala, uid);
     const jugadores = {};
-    Object.entries(sala.jugadores).forEach(([u, j]) => {
+    Object.entries(quedan).forEach(([u, j]) => {
       jugadores[u] = { ...jugadorNuevo(j.nombre), visto: j.visto };
     });
     tx.update(ref, {
-      jugadores, fase: "espera", orden: [], mazoBlanco: [], mazoNegro: [], cartaNegra: null,
+      jugadores, anfitrion, fase: "espera", orden: [], mazoBlanco: [], mazoNegro: [], cartaNegra: null,
       esRondaDorada: false, ronda: 0, retoInicial: "", respuestas: {}, revSubs: [], revIdx: 0,
       votos: {}, ultimaRonda: null, shotActivo: null, modoLibre: false,
     });
   });
+}
+
+export async function salirDeSala(codigo, uid) {
+  await salirDeSalaComun(salaRef(codigo), uid);
 }
 
 export async function unirseSala(codigo, nombre, uid) {
@@ -88,7 +94,7 @@ export async function unirseSala(codigo, nombre, uid) {
     if (sala.fase !== "espera") throw new Error("SALA_YA_EMPEZO");
     if (Object.keys(jugadores).length >= 8) throw new Error("SALA_LLENA");
     const nombreExiste = Object.values(jugadores).some(
-      (j) => j.nombre.toLowerCase() === nombre.trim().toLowerCase()
+      (j) => (j.nombre || "").toLowerCase() === nombre.trim().toLowerCase()
     );
     if (nombreExiste) throw new Error("NOMBRE_REPETIDO");
     tx.update(ref, { [`jugadores.${uid}`]: jugadorNuevo(nombre) });
@@ -136,7 +142,7 @@ function jugadorNuevo(nombre) {
 // Firestore no tiene "onDisconnect" como Realtime Database, así que cada
 // celular avisa "sigo aquí" cada cierto tiempo mientras está en una sala.
 export async function latirPresencia(codigo, uid) {
-  await updateDoc(salaRef(codigo), { [`jugadores.${uid}.visto`]: serverTimestamp() });
+  await latirPresenciaComun(salaRef(codigo), uid);
 }
 
 export function escucharSala(codigo, onCambio, onError) {
@@ -150,10 +156,18 @@ export function escucharSala(codigo, onCambio, onError) {
 // -------------------- Empezar el juego --------------------
 
 export async function iniciarEleccionDeInicio(codigo) {
-  const snap = await getDoc(salaRef(codigo));
-  const { STARTERS } = mazosPara(snap.data()?.idioma);
-  const reto = STARTERS[Math.floor(Math.random() * STARTERS.length)];
-  await updateDoc(salaRef(codigo), { fase: "inicio", retoInicial: reto });
+  // Transacción + revisión de fase: si dos jugadores tocan ARMAR casi a la
+  // vez, o alguien lo toca tarde, no debe devolver a "inicio" una partida
+  // que ya arrancó.
+  const ref = salaRef(codigo);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    const sala = snap.data();
+    if (sala.fase !== "espera") return;
+    const { STARTERS } = mazosPara(sala.idioma);
+    const reto = STARTERS[Math.floor(Math.random() * STARTERS.length)];
+    tx.update(ref, { fase: "inicio", retoInicial: reto });
+  });
 }
 
 export async function elegirQuienEmpieza(codigo, uidElegido) {

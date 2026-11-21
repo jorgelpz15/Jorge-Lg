@@ -1,17 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { S } from "../styles.js";
 import { LIENZO, puntosDesdeFirestore } from "./figuras.js";
-import { avanzar, enviarCorte, iniciarJuego, jugarOtraVez, salirDeSalaEnEspera } from "./salaRebanar.js";
+import { avanzar, enviarCorte, iniciarJuego, jugarOtraVez, salirDeSala, salirDeSalaEnEspera } from "./salaRebanar.js";
 import ComoSeJuega from "../ComoSeJuega.jsx";
+import { estaConectado } from "../shared/presencia.js";
+import BotonSalir from "../shared/BotonSalir.jsx";
 
-const MARGEN_DESCONEXION_MS = 45000;
 const COLORES = ["#ffd700", "#4caf50", "#ff6b35", "#5aa9ff", "#e05aff", "#ff5a7a", "#5affe0", "#c9ff5a"];
-
-function estaConectado(visto, ahora) {
-  if (!visto) return true;
-  const ms = typeof visto.toMillis === "function" ? visto.toMillis() : 0;
-  return ahora - ms < MARGEN_DESCONEXION_MS;
-}
 
 function puntoDesdeEvento(svgEl, clientX, clientY) {
   const rect = svgEl.getBoundingClientRect();
@@ -92,13 +87,6 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
     } catch { /* el navegador no dio permiso de portapapeles, no pasa nada grave */ }
   }
 
-  function BotonSalir() {
-    return (
-      <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer", marginTop: 18 }}
-        onClick={() => setConfirmarSalida(true)}>Salir de la sala</button>
-    );
-  }
-
   // ---------- Confirmación de salida ----------
   if (confirmarSalida) {
     const enEspera = sala.fase === "espera";
@@ -125,7 +113,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
     const conectados = entradas.filter(([, j]) => estaConectado(j.visto, ahora)).length;
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
-        <p style={{ color: "#7a7a7a", fontSize: 12, letterSpacing: 3, textTransform: "uppercase", textAlign: "center", margin: "0 0 4px" }}>Código de la sala</p>
+        <p style={{ color: "#8a8a8a", fontSize: 12, letterSpacing: 3, textTransform: "uppercase", textAlign: "center", margin: "0 0 4px" }}>Código de la sala</p>
         <div style={{ ...S.codeBox, alignSelf: "center" }}>{sala.codigo}</div>
         <p style={{ color: "#ffd700", fontSize: 12, textAlign: "center", margin: "0 0 16px" }}>{sala.dificultad === "linea" ? "📏 Modo línea" : "👆 Modo deslizar"}</p>
         <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", marginBottom: 20 }}
@@ -137,7 +125,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
             return (
               <div key={u} style={{ ...S.chip, justifyContent: "space-between", opacity: online ? 1 : 0.5 }}>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>
-                  <span style={{ color: online ? "#4caf50" : "#7a7a7a" }}>●</span> {j.nombre}
+                  <span style={{ color: online ? "#4caf50" : "#8a8a8a" }}>●</span> {j.nombre}
                   {u === sala.anfitrion && " 👑"}
                 </span>
                 {!online && <span style={{ color: "#888", fontSize: 11 }}>desconectado</span>}
@@ -147,8 +135,8 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
         </div>
         <ComoSeJuega storageKey="rebanar_reglas_vistas" texto="Te toca un porcentaje (ej. 40%). Corta la figura lo más cerca posible de ese punto exacto — desliza el dedo o arrastra la línea, según el modo de la sala. Gana quien se acerque más al objetivo." />
         <button style={S.btn} onClick={() => iniciarJuego(codigo)}>¡ARMAR JUEGO! ({entradas.length})</button>
-        {entradas.length < 2 && <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", marginTop: 8 }}>Puedes jugar solo para practicar, o esperar a que se unan más amigos</p>}
-        <div style={{ textAlign: "center" }}><BotonSalir /></div>
+        {entradas.length < 2 && <p style={{ color: "#8a8a8a", fontSize: 12, textAlign: "center", marginTop: 8 }}>Puedes jugar solo para practicar, o esperar a que se unan más amigos</p>}
+        <div style={{ textAlign: "center" }}><BotonSalir onClick={() => setConfirmarSalida(true)} /></div>
       </div>
     );
   }
@@ -185,7 +173,15 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
     function alSoltarPuntero(e) {
       if (sala.dificultad !== "deslizar") return;
       setArrastrando(false);
-      if (puntoA && puntoB) confirmarCorte(puntoA, puntoB);
+      if (puntoA && puntoB) {
+        // Un toque sin arrastrar no es un corte: no gastar la ronda por accidente.
+        if (Math.hypot(puntoB[0] - puntoA[0], puntoB[1] - puntoA[1]) < 12) {
+          setPuntoA(null);
+          setPuntoB(null);
+          return;
+        }
+        confirmarCorte(puntoA, puntoB);
+      }
     }
 
     function alBajarPuntero(e) {
@@ -225,14 +221,14 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 320, margin: "0 auto 10px" }}>
-          <span style={{ background: "#222", color: "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Ronda {sala.ronda}/{sala.totalRondas}</span>
+          <span style={{ background: "#222", color: "#888", fontSize: 12, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Ronda {sala.ronda}/{sala.totalRondas}</span>
           <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>{yo.nombre}</span>
         </div>
         <h2 style={{ fontSize: 20, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 6px" }}>
           Corta {sala.figuraActual.emoji} {sala.figuraActual.nombre}
         </h2>
         <p style={{ color: "#ffd700", fontSize: 15, fontWeight: 800, textAlign: "center", margin: "0 0 4px" }}>Objetivo: {objetivoPct}% – {100 - objetivoPct}%</p>
-        <p style={{ color: "#7a7a7a", fontSize: 12, textAlign: "center", margin: "0 0 16px" }}>
+        <p style={{ color: "#8a8a8a", fontSize: 12, textAlign: "center", margin: "0 0 16px" }}>
           {sala.dificultad === "linea" ? "Arrastra los dos extremos de la línea" : "Desliza el dedo de un lado a otro, como un cuchillo"}
         </p>
         <FiguraSvg puntos={puntosFigura} svgRef={svgRef} onPointerDown={alBajarPuntero} onPointerMove={alMoverEnLienzo} onPointerUp={alSoltarEnLienzo}>
@@ -251,7 +247,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
             CONFIRMAR CORTE
           </button>
         )}
-        <div style={{ textAlign: "center" }}><BotonSalir /></div>
+        <div style={{ textAlign: "center" }}><BotonSalir onClick={() => setConfirmarSalida(true)} /></div>
       </div>
     );
   }
@@ -286,7 +282,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
                 <span style={{ width: 10, height: 10, borderRadius: 5, background: COLORES[sala.orden.indexOf(u) % COLORES.length], flexShrink: 0 }} />
                 <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: "#fff" }}>{esGanador && "👑 "}{nombre(u)}</span>
                 <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>{logradoPct}% – {100 - logradoPct}%</span>
-                <span style={{ fontSize: 11, color: "#7a7a7a" }}>({Math.round(corte.error * 100)}% de error)</span>
+                <span style={{ fontSize: 12, color: "#8a8a8a" }}>({Math.round(corte.error * 100)}% de error)</span>
               </div>
             );
           })}
@@ -294,7 +290,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
         <button style={S.btnGold} onClick={() => avanzar(codigo)}>
           {sala.ronda >= sala.totalRondas ? "Ver resultado final →" : "Siguiente ronda →"}
         </button>
-        <div style={{ textAlign: "center" }}><BotonSalir /></div>
+        <div style={{ textAlign: "center" }}><BotonSalir onClick={() => setConfirmarSalida(true)} /></div>
       </div>
     );
   }
@@ -307,10 +303,17 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
       return (j1.errorTotal || 0) - (j2.errorTotal || 0);
     });
 
+    async function salirDelFin() {
+      // Salir de verdad (no solo cerrar la sesión local), para no dejar un
+      // jugador fantasma si el grupo arma una revancha.
+      try { await salirDeSala(codigo, uid); } catch { /* sin red: igual lo sacamos de la pantalla */ }
+      onSalir();
+    }
+
     async function alJugarOtraVez() {
       setCargandoRevancha(true);
       try {
-        await jugarOtraVez(codigo);
+        await jugarOtraVez(codigo, uid);
       } finally {
         setCargandoRevancha(false);
       }
@@ -323,7 +326,7 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
           <h1 className="fade-rise" style={{ fontSize: 28, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>
             {sala.orden.length > 1 ? `¡${nombre(ordenados[0])} corta mejor!` : "¡Terminaste la práctica!"}
           </h1>
-          <p style={{ color: "#7a7a7a", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>
+          <p style={{ color: "#8a8a8a", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 5, width: "100%" }}>
           {ordenados.map((u, i) => (
@@ -331,14 +334,14 @@ export default function JuegoRebanar({ sala, uid, codigo, onSalir }) {
               <span style={{ fontSize: 18, width: 28, textAlign: "center" }}>{i === 0 ? "👑" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}</span>
               <span style={{ flex: 1, fontSize: 15, fontWeight: 700, color: "#fff" }}>{sala.jugadores[u].nombre}</span>
               <span style={{ fontSize: 13, color: "#ffd700", fontWeight: 700 }}>{sala.jugadores[u].rondasGanadas} rondas</span>
-              <span style={{ fontSize: 11, color: "#7a7a7a" }}>{Math.round((sala.jugadores[u].errorTotal || 0) * 100)}% error total</span>
+              <span style={{ fontSize: 12, color: "#8a8a8a" }}>{Math.round((sala.jugadores[u].errorTotal || 0) * 100)}% error total</span>
             </div>
           ))}
         </div>
         <button style={S.btnGold} disabled={cargandoRevancha} onClick={alJugarOtraVez}>
           {cargandoRevancha ? "Reiniciando…" : "🔁 Jugar otra vez"}
         </button>
-        <button style={S.btn} onClick={onSalir}>Salir a inicio</button>
+        <button style={S.btn} onClick={salirDelFin}>Salir a inicio</button>
       </div>
     );
   }

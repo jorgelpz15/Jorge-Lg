@@ -9,7 +9,7 @@ export default function ModalReglas({ onCerrar }) {
   return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
       <h2 style={{ fontSize: 22, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 4px" }}>📋 Las reglas</h2>
-      <p style={{ color: "#7a7a7a", fontSize: 12, textAlign: "center", margin: "0 0 18px" }}>Qué le toca a cada carta</p>
+      <p style={{ color: "#8a8a8a", fontSize: 12, textAlign: "center", margin: "0 0 18px" }}>Qué le toca a cada carta</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%", maxWidth: 380, margin: "0 auto", overflowY: "auto" }}>
         {ORDEN.map((valor) => {
           const r = REGLAS[valor];

@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
 import { S } from "../styles.js";
 import { ajustarNumDados, tirarDados, salirDeSala, MIN_DADOS, MAX_DADOS } from "./salaDados.js";
+import { estaConectado } from "../shared/presencia.js";
+import BotonSalir from "../shared/BotonSalir.jsx";
 
-const MARGEN_DESCONEXION_MS = 45000;
-
-function estaConectado(visto, ahora) {
-  if (!visto) return true;
-  const ms = typeof visto.toMillis === "function" ? visto.toMillis() : 0;
-  return ahora - ms < MARGEN_DESCONEXION_MS;
-}
 
 // Posiciones de los puntos en una cuadrícula 3x3, como un dado de verdad.
 const PUNTOS_POR_VALOR = {
@@ -93,7 +88,7 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
     if (tirando) return;
     setTirando(true);
     try {
-      await tirarDados(codigo, uid, numDadosLocal);
+      await tirarDados(codigo, uid);
     } finally {
       setTirando(false);
     }
@@ -120,12 +115,12 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
   return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 380, margin: "0 auto 4px" }}>
-        <span style={{ background: "#222", color: "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Sala {sala.codigo}</span>
+        <span style={{ background: "#222", color: "#888", fontSize: 12, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Sala {sala.codigo}</span>
         <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>{yo.nombre}</span>
       </div>
       <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", margin: "10px 0" }}
         onClick={copiarInvitacion}><span key={copiado} className="fade-rise">{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</span></button>
-      <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", margin: "0 0 8px" }}>
+      <p style={{ color: "#8a8a8a", fontSize: 12, textAlign: "center", margin: "0 0 8px" }}>
         Jugadores ({entradas.filter(([, j]) => estaConectado(j.visto, ahora)).length}/{entradas.length} conectados)
       </p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", margin: "0 0 24px", maxWidth: 380 }}>
@@ -133,8 +128,8 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
           const online = estaConectado(j.visto, ahora);
           return (
             <span key={u} style={{ ...S.chip, opacity: online ? 0.85 : 0.4 }}>
-              <span style={{ color: online ? "#4caf50" : "#7a7a7a" }}>●</span> {j.nombre}{u === sala.anfitrion && " 👑"}
-              {!online && <span style={{ color: "#7a7a7a", fontSize: 10 }}> · desconectado</span>}
+              <span style={{ color: online ? "#4caf50" : "#8a8a8a" }}>●</span> {j.nombre}{u === sala.anfitrion && " 👑"}
+              {!online && <span style={{ color: "#8a8a8a", fontSize: 10 }}> · desconectado</span>}
             </span>
           );
         })}
@@ -147,10 +142,10 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
               {tiro.valores.map((v, i) => <Dado key={i} valor={v} />)}
             </div>
             <p style={{ color: "#ffd700", fontSize: 22, fontWeight: 900, margin: 0 }}>Suma: {tiro.suma}</p>
-            <p style={{ color: "#7a7a7a", fontSize: 12, margin: 0 }}>Tiró {sala.jugadores[tiro.tiradoPor]?.nombre || "alguien"}</p>
+            <p style={{ color: "#8a8a8a", fontSize: 12, margin: 0 }}>Tiró {sala.jugadores[tiro.tiradoPor]?.nombre || "alguien"}</p>
           </>
         ) : (
-          <p style={{ color: "#7a7a7a", fontSize: 14, textAlign: "center" }}>Nadie ha tirado los dados todavía</p>
+          <p style={{ color: "#8a8a8a", fontSize: 14, textAlign: "center" }}>Nadie ha tirado los dados todavía</p>
         )}
       </div>
 
@@ -172,8 +167,7 @@ export default function PantallaDados({ sala, uid, codigo, onSalir }) {
           {tirando ? "TIRANDO…" : "🎲 TIRAR DADOS"}
         </button>
         <div style={{ textAlign: "center" }}>
-          <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer", marginTop: 18 }}
-            onClick={() => setConfirmarSalida(true)}>Salir de la sala</button>
+          <BotonSalir onClick={() => setConfirmarSalida(true)} />
         </div>
       </div>
     </div>

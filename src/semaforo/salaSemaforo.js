@@ -18,6 +18,7 @@ import {
   doc, getDoc, setDoc, updateDoc, onSnapshot, runTransaction, serverTimestamp, deleteField,
 } from "firebase/firestore";
 import { db } from "../firebase.js";
+import { salirDeSalaComun, jugadoresParaRevancha, latirPresenciaComun } from "../shared/salaComun.js";
 
 const OPCIONES_RONDAS = [3, 5, 10];
 const TOTAL_RONDAS_POR_DEFECTO = 3;
@@ -61,22 +62,27 @@ export async function crearSala(nombre, totalRondas, uid) {
 
 // Revancha en la MISMA sala: la regresa a la sala de espera con marcadores en
 // cero; todos los que siguen dentro vuelven solos, sin cambiar de código.
-export async function jugarOtraVez(codigo) {
+export async function jugarOtraVez(codigo, uid) {
   const ref = salaRef(codigo);
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(ref);
     if (!snap.exists()) return;
     const sala = snap.data();
-    if (sala.fase !== "fin") return;
+    if (sala.fase !== "fin" || !sala.jugadores[uid]) return;
+    const { jugadores: quedan, anfitrion } = jugadoresParaRevancha(sala, uid);
     const jugadores = {};
-    Object.entries(sala.jugadores).forEach(([u, j]) => {
+    Object.entries(quedan).forEach(([u, j]) => {
       jugadores[u] = { ...j, rondasGanadas: 0, tiempoTotalMs: 0 };
     });
     tx.update(ref, {
-      jugadores, fase: "espera", orden: [], ronda: 0, horaInicio: null, demoraMs: 0,
+      jugadores, anfitrion, fase: "espera", orden: [], ronda: 0, horaInicio: null, demoraMs: 0,
       reacciones: {}, ultimaRonda: null,
     });
   });
+}
+
+export async function salirDeSala(codigo, uid) {
+  await salirDeSalaComun(salaRef(codigo), uid);
 }
 
 export async function unirseSala(codigo, nombre, uid) {
@@ -89,7 +95,7 @@ export async function unirseSala(codigo, nombre, uid) {
     if (jugadores[uid]) return;
     if (sala.fase !== "espera") throw new Error("SALA_YA_EMPEZO");
     if (Object.keys(jugadores).length >= 8) throw new Error("SALA_LLENA");
-    const nombreExiste = Object.values(jugadores).some((j) => j.nombre.toLowerCase() === nombre.trim().toLowerCase());
+    const nombreExiste = Object.values(jugadores).some((j) => (j.nombre || "").toLowerCase() === nombre.trim().toLowerCase());
     if (nombreExiste) throw new Error("NOMBRE_REPETIDO");
     tx.update(ref, { [`jugadores.${uid}`]: jugadorNuevo(nombre) });
   });
@@ -113,7 +119,7 @@ export async function salirDeSalaEnEspera(codigo, uid) {
 }
 
 export async function latirPresencia(codigo, uid) {
-  await updateDoc(salaRef(codigo), { [`jugadores.${uid}.visto`]: serverTimestamp() });
+  await latirPresenciaComun(salaRef(codigo), uid);
 }
 
 export function escucharSala(codigo, onCambio, onError) {

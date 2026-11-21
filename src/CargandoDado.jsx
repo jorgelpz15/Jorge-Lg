@@ -1,5 +1,12 @@
+import { useEffect, useState } from "react";
+import { S } from "./styles";
+
 // Pantalla de carga: el dado del logo con un par de destellos. Solo CSS
 // (ver .cargando-dado en index.css), sin animar nada con prefers-reduced-motion.
+// Si tarda demasiado (sin señal, Firebase caído) ofrece una salida: nadie
+// debe quedarse atorado mirando un dado girar para siempre.
+const ESPERA_MAXIMA_MS = 12000;
+
 function Destello({ x, y, size, delay }) {
   return (
     <svg className="cargando-destello" style={{ left: x, top: y, width: size, height: size, animationDelay: delay }}
@@ -9,7 +16,13 @@ function Destello({ x, y, size, delay }) {
   );
 }
 
-export default function CargandoDado({ texto = "Cargando…" }) {
+export default function CargandoDado({ texto = "Cargando…", onVolver }) {
+  const [tarda, setTarda] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setTarda(true), ESPERA_MAXIMA_MS);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <div role="status" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
       <div style={{ position: "relative", width: 96, height: 96 }}>
@@ -24,7 +37,16 @@ export default function CargandoDado({ texto = "Cargando…" }) {
         <Destello x={92} y={-6} size={22} delay="0.5s" />
         <Destello x={88} y={78} size={13} delay="1s" />
       </div>
-      <p style={{ color: "#7a7a7a", fontSize: 13, margin: 0 }}>{texto}</p>
+      <p style={{ color: "#8a8a8a", fontSize: 13, margin: 0 }}>{texto}</p>
+      {tarda && (
+        <div className="fade-rise" style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center", maxWidth: 280 }}>
+          <p style={{ color: "#bbb", fontSize: 13, textAlign: "center", margin: 0 }}>
+            Está tardando más de lo normal. Revisa tu señal.
+          </p>
+          <button style={{ ...S.navBtn, minWidth: 200 }} onClick={() => location.reload()}>Reintentar</button>
+          {onVolver && <button style={{ ...S.navBtn, minWidth: 200 }} onClick={onVolver}>← Volver al menú</button>}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLatido } from "./useLatido.js";
 
 // Reemplaza el bloque de sesión/localStorage/heartbeat que los otros 5
 // *App.jsx del hub repiten casi línea por línea (ver
@@ -28,14 +29,7 @@ export function useSalaSession({ claveLocal, escucharSala, latirPresencia, uid, 
     return unsub;
   }, [codigo, uid]);
 
-  // El `sala != null` en las dependencias es intencional: re-arma el
-  // intervalo cuando `sala` pasa de null a con-valor, no en cada cambio de
-  // contenido de `sala` (igual que en los otros 5 juegos).
-  useEffect(() => {
-    if (!codigo || !sala) return;
-    const t = setInterval(() => latirPresencia(codigo, uid), 20000);
-    return () => clearInterval(t);
-  }, [codigo, uid, sala != null]);
+  useLatido(Boolean(codigo && sala), () => latirPresencia(codigo, uid));
 
   function handleEntrar(codigoNuevo) {
     localStorage.setItem(claveLocal, JSON.stringify({ codigo: codigoNuevo }));

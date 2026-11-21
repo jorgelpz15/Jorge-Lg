@@ -7,6 +7,7 @@ import {
   doc, getDoc, setDoc, updateDoc, onSnapshot, runTransaction, serverTimestamp, deleteField,
 } from "firebase/firestore";
 import { db } from "../firebase.js";
+import { latirPresenciaComun } from "../shared/salaComun.js";
 
 const PALOS = ["♠️", "♥️", "♦️", "♣️"];
 const VALORES = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
@@ -87,7 +88,7 @@ export async function unirseSala(codigo, nombre, uid) {
     const jugadores = sala.jugadores || {};
     if (jugadores[uid]) return;
     if (Object.keys(jugadores).length >= 12) throw new Error("SALA_LLENA");
-    const nombreExiste = Object.values(jugadores).some((j) => j.nombre.toLowerCase() === nombre.trim().toLowerCase());
+    const nombreExiste = Object.values(jugadores).some((j) => (j.nombre || "").toLowerCase() === nombre.trim().toLowerCase());
     if (nombreExiste) throw new Error("NOMBRE_REPETIDO");
     tx.update(ref, { [`jugadores.${uid}`]: jugadorNuevo(nombre) });
   });
@@ -112,7 +113,7 @@ export async function salirDeSala(codigo, uid) {
 }
 
 export async function latirPresencia(codigo, uid) {
-  await updateDoc(salaRef(codigo), { [`jugadores.${uid}.visto`]: serverTimestamp() });
+  await latirPresenciaComun(salaRef(codigo), uid);
 }
 
 export function escucharSala(codigo, onCambio, onError) {

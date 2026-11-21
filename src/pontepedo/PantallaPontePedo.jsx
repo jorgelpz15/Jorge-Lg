@@ -3,14 +3,9 @@ import { S } from "../styles.js";
 import { sacarCarta, establecerRegla, reiniciarMazo, salirDeSala, REGLAS } from "./salaPontePedo.js";
 import ModalReglas from "./ModalReglas.jsx";
 import ComoSeJuega from "../ComoSeJuega.jsx";
+import { estaConectado } from "../shared/presencia.js";
+import BotonSalir from "../shared/BotonSalir.jsx";
 
-const MARGEN_DESCONEXION_MS = 45000;
-
-function estaConectado(visto, ahora) {
-  if (!visto) return true;
-  const ms = typeof visto.toMillis === "function" ? visto.toMillis() : 0;
-  return ahora - ms < MARGEN_DESCONEXION_MS;
-}
 
 function colorPalo(palo) {
   return palo === "♥️" || palo === "♦️" ? "#ff4444" : "#222";
@@ -111,12 +106,12 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
   return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 380, margin: "0 auto 4px" }}>
-        <span style={{ background: "#222", color: "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Sala {sala.codigo}</span>
+        <span style={{ background: "#222", color: "#888", fontSize: 12, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Sala {sala.codigo}</span>
         <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>{yo.nombre}</span>
       </div>
       <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", margin: "10px 0" }}
         onClick={copiarInvitacion}><span key={copiado} className="fade-rise">{copiado ? "¡Copiado! ✓" : "📋 Copiar invitación"}</span></button>
-      <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", margin: "0 0 8px" }}>
+      <p style={{ color: "#8a8a8a", fontSize: 12, textAlign: "center", margin: "0 0 8px" }}>
         Jugadores ({entradas.filter(([, j]) => estaConectado(j.visto, ahora)).length}/{entradas.length} conectados)
       </p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", margin: "0 0 14px", maxWidth: 380 }}>
@@ -124,14 +119,14 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
           const online = estaConectado(j.visto, ahora);
           return (
             <span key={u} style={{ ...S.chip, opacity: online ? 0.85 : 0.4 }}>
-              <span style={{ color: online ? "#4caf50" : "#7a7a7a" }}>●</span> {j.nombre}{u === sala.anfitrion && " 👑"}
-              {!online && <span style={{ color: "#7a7a7a", fontSize: 10 }}> · desconectado</span>}
+              <span style={{ color: online ? "#4caf50" : "#8a8a8a" }}>●</span> {j.nombre}{u === sala.anfitrion && " 👑"}
+              {!online && <span style={{ color: "#8a8a8a", fontSize: 10 }}> · desconectado</span>}
             </span>
           );
         })}
       </div>
       <ComoSeJuega storageKey="pontepedo_reglas_vistas" texto={'Cualquiera saca carta y todos ven el mismo reto — pasen el celular o júntense alrededor de una pantalla. Cada carta tiene su propia regla (toca "Ver todas las reglas" para verlas todas de un jalón antes de empezar).'} />
-      <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 11, textDecoration: "underline", cursor: "pointer", alignSelf: "center", marginBottom: 4 }}
+      <button style={{ background: "none", border: "none", color: "#8a8a8a", fontSize: 13, textDecoration: "underline", cursor: "pointer", minHeight: 44, padding: "12px 10px", alignSelf: "center", marginBottom: 4 }}
         onClick={() => setVerReglas(true)}>📋 Ver todas las reglas</button>
 
       {editandoRegla ? (
@@ -144,12 +139,12 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
         </div>
       ) : sala.reglaActiva ? (
         <div style={{ background: "#1a1000", border: "1px solid #ffd700", borderRadius: 12, padding: "10px 14px", marginBottom: 14, width: "100%", maxWidth: 380, boxSizing: "border-box", display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 10, color: "#ffd700", fontWeight: 800, flexShrink: 0 }}>📜 REGLA</span>
+          <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 800, flexShrink: 0 }}>📜 REGLA</span>
           <span style={{ fontSize: 13, color: "#fff", flex: 1 }}>{sala.reglaActiva}</span>
-          <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 11, textDecoration: "underline", cursor: "pointer", flexShrink: 0 }} onClick={abrirEditorRegla}>editar</button>
+          <button style={{ background: "none", border: "none", color: "#8a8a8a", fontSize: 13, textDecoration: "underline", cursor: "pointer", minHeight: 44, padding: "12px 10px", flexShrink: 0 }} onClick={abrirEditorRegla}>editar</button>
         </div>
       ) : (
-        <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 11, textDecoration: "underline", cursor: "pointer", marginBottom: 14 }} onClick={abrirEditorRegla}>
+        <button style={{ background: "none", border: "none", color: "#8a8a8a", fontSize: 13, textDecoration: "underline", cursor: "pointer", minHeight: 44, padding: "12px 10px", marginBottom: 14 }} onClick={abrirEditorRegla}>
           + escribir la regla activa
         </button>
       )}
@@ -167,21 +162,21 @@ export default function PantallaPontePedo({ sala, uid, codigo, onSalir }) {
               <p style={{ color: "#ffd700", fontSize: 19, fontWeight: 900, margin: "0 0 6px" }}>{info.emoji} {info.nombre}</p>
               <p style={{ color: "#ccc", fontSize: 13, lineHeight: 1.5, margin: 0 }}>{info.texto}</p>
             </div>
-            <p style={{ color: "#7a7a7a", fontSize: 11, margin: 0 }}>Sacó {sala.jugadores[carta.sacadaPor]?.nombre || "alguien"}</p>
+            <p style={{ color: "#8a8a8a", fontSize: 12, margin: 0 }}>Sacó {sala.jugadores[carta.sacadaPor]?.nombre || "alguien"}</p>
           </div>
         ) : (
-          <p style={{ color: "#7a7a7a", fontSize: 14, textAlign: "center" }}>Nadie ha sacado carta todavía</p>
+          <p style={{ color: "#8a8a8a", fontSize: 14, textAlign: "center" }}>Nadie ha sacado carta todavía</p>
         )}
       </div>
 
       <div style={{ width: "100%", maxWidth: 380, margin: "0 auto" }}>
-        <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", margin: "0 0 10px" }}>Quedan {sala.mazo.length} cartas en el mazo</p>
+        <p style={{ color: "#8a8a8a", fontSize: 12, textAlign: "center", margin: "0 0 10px" }}>Quedan {sala.mazo.length} cartas en el mazo</p>
         <button style={{ ...S.btnGold, opacity: sacando ? 0.6 : 1 }} disabled={sacando} onClick={handleSacarCarta}>
           {sacando ? "SACANDO…" : "🃏 SACAR CARTA"}
         </button>
-        <div style={{ textAlign: "center", display: "flex", justifyContent: "center", gap: 14, marginTop: 18 }}>
-          <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer" }} onClick={() => setConfirmarReinicio(true)}>Barajar de nuevo</button>
-          <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer" }} onClick={() => setConfirmarSalida(true)}>Salir de la sala</button>
+        <div style={{ textAlign: "center", display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 4, marginTop: 12 }}>
+          <BotonSalir texto="Barajar de nuevo" onClick={() => setConfirmarReinicio(true)} />
+          <BotonSalir onClick={() => setConfirmarSalida(true)} />
         </div>
       </div>
     </div>

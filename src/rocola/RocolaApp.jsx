@@ -18,7 +18,7 @@ export default function RocolaApp({ uid, onVolverAlMenu, codigoInicial }) {
   if (!sala) {
     return (
       <div style={S.page}>
-        <CargandoDado texto="Entrando a la sala…" />
+        <CargandoDado texto="Entrando a la sala…" onVolver={onVolverAlMenu} />
       </div>
     );
   }

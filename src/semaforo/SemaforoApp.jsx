@@ -4,9 +4,9 @@ import { escucharSala, latirPresencia } from "./salaSemaforo.js";
 import LobbySemaforo from "./LobbySemaforo.jsx";
 import JuegoSemaforo from "./JuegoSemaforo.jsx";
 import CargandoDado from "../CargandoDado.jsx";
+import { useLatido } from "../shared/useLatido.js";
 
 const CLAVE_LOCAL = "semaforo_sesion";
-const LATIDO_MS = 20000;
 
 export default function SemaforoApp({ uid, onVolverAlMenu, codigoInicial }) {
   const [codigo, setCodigo] = useState(() => {
@@ -33,11 +33,7 @@ export default function SemaforoApp({ uid, onVolverAlMenu, codigoInicial }) {
     return unsub;
   }, [codigo, uid]);
 
-  useEffect(() => {
-    if (!codigo || !sala) return;
-    const t = setInterval(() => latirPresencia(codigo, uid), LATIDO_MS);
-    return () => clearInterval(t);
-  }, [codigo, uid, sala != null]);
+  useLatido(Boolean(codigo && uid && sala), () => latirPresencia(codigo, uid));
 
   function handleEntrar(codigoNuevo) {
     localStorage.setItem(CLAVE_LOCAL, JSON.stringify({ codigo: codigoNuevo }));
@@ -57,7 +53,7 @@ export default function SemaforoApp({ uid, onVolverAlMenu, codigoInicial }) {
   if (!sala) {
     return (
       <div style={S.page}>
-        <CargandoDado texto="Entrando a la sala…" />
+        <CargandoDado texto="Entrando a la sala…" onVolver={onVolverAlMenu} />
       </div>
     );
   }

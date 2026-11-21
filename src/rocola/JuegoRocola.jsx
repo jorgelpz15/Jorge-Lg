@@ -5,10 +5,11 @@ import ConfirmarSalidaDialog from "../shared/ConfirmarSalidaDialog.jsx";
 import ComoSeJuega from "../ComoSeJuega.jsx";
 import {
   iniciarJuego, sugerirCancion, confirmarCancion, enviarRespuesta, avanzar,
-  salirDeSalaEnEspera, jugarOtraVez, djDeRonda, ERAS,
+  salirDeSalaEnEspera, jugarOtraVez, salirDeSala, djDeRonda, ERAS,
 } from "./salaRocola.js";
+import BotonSalir from "../shared/BotonSalir.jsx";
 
-const NOMBRES_ERA = { "80s": "80s", "90s": "90s", "2000s": "2000s", hoy: "Hoy" };
+const NOMBRES_ERA = { "70s": "70s", "80s": "80s", "90s": "90s", "2000s": "2000s", hoy: "Hoy" };
 
 export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
   const [ahora, setAhora] = useState(() => Date.now());
@@ -49,13 +50,6 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
       setCopiado(true);
       setTimeout(() => setCopiado(false), 2000);
     } catch { /* el navegador no dio permiso de portapapeles, no pasa nada grave */ }
-  }
-
-  function BotonSalir() {
-    return (
-      <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer", marginTop: 18 }}
-        onClick={() => setConfirmarSalida(true)}>Salir de la sala</button>
-    );
   }
 
   function elegirEra(era) {
@@ -103,7 +97,7 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
     const conectados = entradas.filter(([, j]) => estaConectado(j.visto, ahora)).length;
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
-        <p style={{ color: "#7a7a7a", fontSize: 12, letterSpacing: 3, textTransform: "uppercase", textAlign: "center", margin: "0 0 4px" }}>Código de la sala</p>
+        <p style={{ color: "#8a8a8a", fontSize: 12, letterSpacing: 3, textTransform: "uppercase", textAlign: "center", margin: "0 0 4px" }}>Código de la sala</p>
         <div style={{ ...S.codeBox, alignSelf: "center" }}>{sala.codigo}</div>
         <p style={{ color: "#ffd700", fontSize: 12, textAlign: "center", margin: "0 0 16px" }}>{sala.totalRondas} rondas</p>
         <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", marginBottom: 20 }}
@@ -115,7 +109,7 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
             return (
               <div key={u} style={{ ...S.chip, justifyContent: "space-between", opacity: online ? 1 : 0.5 }}>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>
-                  <span style={{ color: online ? "#4caf50" : "#7a7a7a" }}>●</span> {j.nombre}
+                  <span style={{ color: online ? "#4caf50" : "#8a8a8a" }}>●</span> {j.nombre}
                   {u === sala.anfitrion && " 👑"}
                 </span>
                 {!online && <span style={{ color: "#888", fontSize: 11 }}>desconectado</span>}
@@ -125,8 +119,8 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
         </div>
         <ComoSeJuega storageKey="rocola_reglas_vistas" texto="Cada ronda alguien es el DJ (rota solo) y pone una canción sugerida desde su Spotify. Los demás adivinan en privado el año en que salió — gana quien se acerque más." />
         <button style={{ ...S.btn, opacity: entradas.length >= 2 ? 1 : 0.3 }} disabled={entradas.length < 2} onClick={() => iniciarJuego(codigo)}>¡ARMAR JUEGO! ({entradas.length})</button>
-        {entradas.length < 2 && <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", marginTop: 8 }}>Se necesitan mínimo 2 jugadores</p>}
-        <div style={{ textAlign: "center" }}><BotonSalir /></div>
+        {entradas.length < 2 && <p style={{ color: "#8a8a8a", fontSize: 12, textAlign: "center", marginTop: 8 }}>Se necesitan mínimo 2 jugadores</p>}
+        <div style={{ textAlign: "center" }}><BotonSalir onClick={() => setConfirmarSalida(true)} /></div>
       </div>
     );
   }
@@ -140,7 +134,7 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
       return (
         <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 380, margin: "0 auto 10px" }}>
-            <span style={{ background: "#222", color: "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Ronda {sala.ronda}/{sala.totalRondas}</span>
+            <span style={{ background: "#222", color: "#888", fontSize: 12, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Ronda {sala.ronda}/{sala.totalRondas}</span>
             <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>Te toca ser DJ 🎧</span>
           </div>
           {!eraElegida ? (
@@ -154,7 +148,7 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
             </>
           ) : (
             <div style={{ width: "100%", maxWidth: 380, margin: "0 auto", textAlign: "center" }}>
-              <p style={{ color: "#7a7a7a", fontSize: 12, margin: "0 0 6px" }}>Te tocó:</p>
+              <p style={{ color: "#8a8a8a", fontSize: 12, margin: "0 0 6px" }}>Te tocó:</p>
               <h2 style={{ fontSize: 22, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>{cancionSugerida?.titulo}</h2>
               <p style={{ color: "#ffd700", fontSize: 14, fontWeight: 700, margin: "0 0 20px" }}>{cancionSugerida?.artista}</p>
               <a href={`https://open.spotify.com/search/${encodeURIComponent(`${cancionSugerida?.titulo} ${cancionSugerida?.artista}`)}`}
@@ -166,7 +160,7 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
               <button style={S.btnGold} onClick={yaLaPuse}>Ya la puse →</button>
             </div>
           )}
-          <div style={{ textAlign: "center" }}><BotonSalir /></div>
+          <div style={{ textAlign: "center" }}><BotonSalir onClick={() => setConfirmarSalida(true)} /></div>
         </div>
       );
     }
@@ -180,7 +174,7 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
             <div style={{ fontSize: 44, marginBottom: 8 }}>🎧</div>
             <h2 style={{ fontSize: 18, fontWeight: 800, color: "#4caf50", margin: "0 0 16px" }}>Sonando: {cancion.titulo}</h2>
             <p style={{ color: "#888", fontSize: 12, margin: "0 0 10px" }}>{respondieron.length} de {totalEsperado} ya adivinaron</p>
-            <BotonSalir />
+            <BotonSalir onClick={() => setConfirmarSalida(true)} />
           </div>
         </div>
       );
@@ -192,7 +186,7 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
           <div style={S.card}>
             <div style={{ fontSize: 44, marginBottom: 8 }}>🎶</div>
             <h2 style={{ fontSize: 18, fontWeight: 800, color: "#fff", margin: "0 0 16px" }}>Esperando a que {nombre(djActual)} elija una canción…</h2>
-            <BotonSalir />
+            <BotonSalir onClick={() => setConfirmarSalida(true)} />
           </div>
         </div>
       );
@@ -204,7 +198,7 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
           <div style={S.card}>
             <div style={{ fontSize: 44, marginBottom: 8 }}>✓</div>
             <h2 style={{ fontSize: 18, fontWeight: 800, color: "#4caf50", margin: "0 0 16px" }}>¡Listo! Esperando a los demás…</h2>
-            <BotonSalir />
+            <BotonSalir onClick={() => setConfirmarSalida(true)} />
           </div>
         </div>
       );
@@ -214,13 +208,13 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 380, margin: "0 auto 10px" }}>
-          <span style={{ background: "#222", color: "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Ronda {sala.ronda}/{sala.totalRondas}</span>
+          <span style={{ background: "#222", color: "#888", fontSize: 12, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>Ronda {sala.ronda}/{sala.totalRondas}</span>
           <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>{yo.nombre}</span>
         </div>
         <h2 style={{ fontSize: 20, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 6px" }}>
           {nombre(djActual)} puso una canción
         </h2>
-        <p style={{ color: "#7a7a7a", fontSize: 12, textAlign: "center", margin: "0 0 20px" }}>¿De qué año crees que es?</p>
+        <p style={{ color: "#8a8a8a", fontSize: 12, textAlign: "center", margin: "0 0 20px" }}>¿De qué año crees que es?</p>
         <p style={{ color: "#ffd700", fontSize: 42, fontWeight: 900, textAlign: "center", margin: "0 0 16px" }}>{anioAdivinado}</p>
         <input type="range" min="1960" max={anioActual} value={anioAdivinado}
           onChange={(e) => setAnioAdivinado(Number(e.target.value))}
@@ -228,7 +222,7 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
         <button style={{ ...S.btnGold, opacity: enviando ? 0.6 : 1 }} disabled={enviando} onClick={handleEnviarRespuesta}>
           {enviando ? "ENVIANDO…" : "Confirmar adivinanza"}
         </button>
-        <div style={{ textAlign: "center" }}><BotonSalir /></div>
+        <div style={{ textAlign: "center" }}><BotonSalir onClick={() => setConfirmarSalida(true)} /></div>
       </div>
     );
   }
@@ -241,7 +235,7 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
         <h2 className="fade-rise" style={{ fontSize: 20, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 4px" }}>{cancion.titulo}</h2>
-        <p className="fade-rise" style={{ color: "#7a7a7a", fontSize: 13, textAlign: "center", margin: "0 0 4px" }}>{cancion.artista}</p>
+        <p className="fade-rise" style={{ color: "#8a8a8a", fontSize: 13, textAlign: "center", margin: "0 0 4px" }}>{cancion.artista}</p>
         <p className="pop-in" style={{ color: "#ffd700", fontSize: 32, fontWeight: 900, textAlign: "center", margin: "0 0 20px" }}>{cancion.anioReal}</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 20 }}>
           {ordenados.map((u) => {
@@ -251,7 +245,7 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
               <div key={u} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "#111", borderRadius: 10, border: esGanador ? "1px solid #ffd700" : "1px solid #1a1a1a" }}>
                 <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: "#fff" }}>{esGanador && "👑 "}{nombre(u)}</span>
                 <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>{t.adivinado}</span>
-                <span style={{ fontSize: 11, color: "#7a7a7a" }}>({t.error} {t.error === 1 ? "año" : "años"} de error)</span>
+                <span style={{ fontSize: 12, color: "#8a8a8a" }}>({t.error} {t.error === 1 ? "año" : "años"} de error)</span>
               </div>
             );
           })}
@@ -259,7 +253,7 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
         <button style={S.btnGold} onClick={() => avanzar(codigo)}>
           {sala.ronda >= sala.totalRondas ? "Ver resultado final →" : "Siguiente ronda →"}
         </button>
-        <div style={{ textAlign: "center" }}><BotonSalir /></div>
+        <div style={{ textAlign: "center" }}><BotonSalir onClick={() => setConfirmarSalida(true)} /></div>
       </div>
     );
   }
@@ -272,10 +266,17 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
       return (j1.errorTotal || 0) - (j2.errorTotal || 0);
     });
 
+    async function salirDelFin() {
+      // Salir de verdad (no solo cerrar la sesión local), para no dejar un
+      // jugador fantasma si el grupo arma una revancha.
+      try { await salirDeSala(codigo, uid); } catch { /* sin red: igual lo sacamos de la pantalla */ }
+      onSalir();
+    }
+
     async function alJugarOtraVez() {
       setCargandoRevancha(true);
       try {
-        await jugarOtraVez(codigo);
+        await jugarOtraVez(codigo, uid);
       } finally {
         setCargandoRevancha(false);
       }
@@ -288,7 +289,7 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
           <h1 className="fade-rise" style={{ fontSize: 28, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>
             {sala.orden.length > 1 ? `¡${nombre(ordenados[0])} tiene el mejor oído!` : "¡Terminaste la partida!"}
           </h1>
-          <p style={{ color: "#7a7a7a", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>
+          <p style={{ color: "#8a8a8a", fontSize: 13, fontStyle: "italic", margin: 0 }}>{sala.totalRondas} rondas jugadas</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 5, width: "100%" }}>
           {ordenados.map((u, i) => (
@@ -296,14 +297,14 @@ export default function JuegoRocola({ sala, uid, codigo, onSalir }) {
               <span style={{ fontSize: 18, width: 28, textAlign: "center" }}>{i === 0 ? "👑" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}</span>
               <span style={{ flex: 1, fontSize: 15, fontWeight: 700, color: "#fff" }}>{sala.jugadores[u].nombre}</span>
               <span style={{ fontSize: 13, color: "#ffd700", fontWeight: 700 }}>{sala.jugadores[u].rondasGanadas || 0} rondas</span>
-              <span style={{ fontSize: 11, color: "#7a7a7a" }}>{sala.jugadores[u].errorTotal || 0} años de error total</span>
+              <span style={{ fontSize: 12, color: "#8a8a8a" }}>{sala.jugadores[u].errorTotal || 0} años de error total</span>
             </div>
           ))}
         </div>
         <button style={S.btnGold} disabled={cargandoRevancha} onClick={alJugarOtraVez}>
           {cargandoRevancha ? "Reiniciando…" : "🔁 Jugar otra vez"}
         </button>
-        <button style={S.btn} onClick={onSalir}>Salir a inicio</button>
+        <button style={S.btn} onClick={salirDelFin}>Salir a inicio</button>
       </div>
     );
   }

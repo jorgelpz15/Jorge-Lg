@@ -7,6 +7,7 @@ import {
   doc, updateDoc, onSnapshot, runTransaction, serverTimestamp, deleteField, getDoc, setDoc,
 } from "firebase/firestore";
 import { db } from "../firebase.js";
+import { latirPresenciaComun } from "../shared/salaComun.js";
 
 const MIN_DADOS = 1;
 const MAX_DADOS = 10;
@@ -48,7 +49,7 @@ export async function unirseSala(codigo, nombre, uid) {
     const jugadores = sala.jugadores || {};
     if (jugadores[uid]) return;
     if (Object.keys(jugadores).length >= 12) throw new Error("SALA_LLENA");
-    const nombreExiste = Object.values(jugadores).some((j) => j.nombre.toLowerCase() === nombre.trim().toLowerCase());
+    const nombreExiste = Object.values(jugadores).some((j) => (j.nombre || "").toLowerCase() === nombre.trim().toLowerCase());
     if (nombreExiste) throw new Error("NOMBRE_REPETIDO");
     tx.update(ref, { [`jugadores.${uid}`]: jugadorNuevo(nombre) });
   });
@@ -73,7 +74,7 @@ export async function salirDeSala(codigo, uid) {
 }
 
 export async function latirPresencia(codigo, uid) {
-  await updateDoc(salaRef(codigo), { [`jugadores.${uid}.visto`]: serverTimestamp() });
+  await latirPresenciaComun(salaRef(codigo), uid);
 }
 
 export function escucharSala(codigo, onCambio, onError) {
@@ -93,13 +94,17 @@ export async function ajustarNumDados(codigo, delta) {
   });
 }
 
-export async function tirarDados(codigo, uid, numDados) {
-  const n = Math.min(MAX_DADOS, Math.max(MIN_DADOS, Math.round(numDados)));
-  const valores = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * 6));
-  const suma = valores.reduce((a, b) => a + b, 0);
-  await updateDoc(salaRef(codigo), {
-    numDados: n,
-    ultimoTiro: { valores, suma, tiradoPor: uid, en: serverTimestamp() },
+export async function tirarDados(codigo, uid) {
+  const ref = salaRef(codigo);
+  // Transacción: el número de dados lo cambia cualquiera con +/-; tirar nunca
+  // debe pisar un cambio reciente con el valor viejo que tenía el celular.
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists()) return;
+    const n = Math.min(MAX_DADOS, Math.max(MIN_DADOS, Math.round(snap.data().numDados)));
+    const valores = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * 6));
+    const suma = valores.reduce((a, b) => a + b, 0);
+    tx.update(ref, { ultimoTiro: { valores, suma, tiradoPor: uid, en: serverTimestamp() } });
   });
 }
 

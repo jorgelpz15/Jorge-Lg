@@ -49,7 +49,7 @@ export default function Lobby({ uid, onEntrar, codigoInicial, onVolverAlMenu }) 
           <div style={{ fontSize: 52, marginBottom: 4 }}>🍆</div>
           <h1 style={{ fontSize: 32, fontWeight: 900, color: "#fff", margin: 0, letterSpacing: 2 }}>CAH</h1>
           <p style={{ color: "#ffd700", fontSize: 12, letterSpacing: 2, margin: "4px 0 0", textTransform: "uppercase", fontWeight: 700 }}>ENG & SPA version</p>
-          <p style={{ color: "#7a7a7a", fontSize: 12, marginTop: 8 }}>{WHITE_CARDS.length + BLACK_CARDS.length} cartas en español · {WHITE_CARDS_EN.length + BLACK_CARDS_EN.length} cards in English</p>
+          <p style={{ color: "#8a8a8a", fontSize: 12, marginTop: 8 }}>{WHITE_CARDS.length + BLACK_CARDS.length} cartas en español · {WHITE_CARDS_EN.length + BLACK_CARDS_EN.length} cards in English</p>
         </div>
         <button style={{ ...S.btnGold, marginBottom: 12 }} onClick={() => setPantalla("crear")}>Crear sala</button>
         <button style={{ ...S.btn, marginBottom: 12 }} onClick={() => setPantalla("unir")}>Unirme con un código</button>
@@ -61,7 +61,7 @@ export default function Lobby({ uid, onEntrar, codigoInicial, onVolverAlMenu }) 
   if (pantalla === "crear") return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Crear sala</h2>
-      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>Tú serás el anfitrión de la partida</p>
+      <p style={{ color: "#8a8a8a", fontSize: 13, margin: "0 0 20px" }}>Tú serás el anfitrión de la partida</p>
       <label style={S.fieldLabel} htmlFor="nombre-crear">Tu nombre</label>
       <input id="nombre-crear" style={{ ...S.input, width: "100%", marginBottom: 16 }} placeholder="Ej. Jorge" value={nombre}
         onChange={e => setNombre(e.target.value)} maxLength={12} />
@@ -69,11 +69,11 @@ export default function Lobby({ uid, onEntrar, codigoInicial, onVolverAlMenu }) 
         <p style={{ color: "#888", fontSize: 13, margin: "0 0 8px" }}>🗣️ Idioma de las cartas:</p>
         <div style={{ display: "flex", gap: 8 }}>
           <button style={{ ...S.nameBtn, flex: 1, ...(idioma === "es" ? { background: "#ffd700", color: "#000", border: "1px solid #ffd700" } : {}) }}
-            onClick={() => setIdioma("es")}>🇲🇽 Español<br /><span style={{ fontSize: 11, fontWeight: 400, opacity: 0.8 }}>{WHITE_CARDS.length + BLACK_CARDS.length} cartas</span></button>
+            onClick={() => setIdioma("es")}>🇲🇽 Español<br /><span style={{ fontSize: 12, fontWeight: 400, opacity: 0.8 }}>{WHITE_CARDS.length + BLACK_CARDS.length} cartas</span></button>
           <button style={{ ...S.nameBtn, flex: 1, ...(idioma === "en" ? { background: "#ffd700", color: "#000", border: "1px solid #ffd700" } : {}) }}
-            onClick={() => setIdioma("en")}>🇺🇸 English<br /><span style={{ fontSize: 11, fontWeight: 400, opacity: 0.8 }}>{WHITE_CARDS_EN.length + BLACK_CARDS_EN.length} cards</span></button>
+            onClick={() => setIdioma("en")}>🇺🇸 English<br /><span style={{ fontSize: 12, fontWeight: 400, opacity: 0.8 }}>{WHITE_CARDS_EN.length + BLACK_CARDS_EN.length} cards</span></button>
         </div>
-        <p style={{ color: "#7a7a7a", fontSize: 11, margin: "8px 0 0" }}>No se pueden mezclar idiomas en la misma partida.</p>
+        <p style={{ color: "#8a8a8a", fontSize: 12, margin: "8px 0 0" }}>No se pueden mezclar idiomas en la misma partida.</p>
       </div>
       <div style={{ marginBottom: 24 }}>
         <p style={{ color: "#888", fontSize: 13, margin: "0 0 8px" }}>🍺 Estrellas para desbloquear un shot:</p>
@@ -93,7 +93,7 @@ export default function Lobby({ uid, onEntrar, codigoInicial, onVolverAlMenu }) 
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
       {codigoInicial && <InvitacionJuego emoji="🍆" nombre="Cartas Contra la Humanidad" />}
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Unirme a una sala</h2>
-      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>
+      <p style={{ color: "#8a8a8a", fontSize: 13, margin: "0 0 20px" }}>
         {codigoInicial ? "Te invitaron a esta partida — solo falta tu nombre" : "Pide el código de 4 dígitos a quien creó la sala"}
       </p>
       <label style={S.fieldLabel} htmlFor="nombre-unir">Tu nombre</label>

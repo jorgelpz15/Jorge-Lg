@@ -45,7 +45,7 @@ export default function LobbyRocola({ uid, onEntrar, onVolverAlMenu, codigoInici
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{ fontSize: 52, marginBottom: 4 }}>🎶</div>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: "#fff", margin: 0 }}>Rocola</h1>
-          <p style={{ color: "#7a7a7a", fontSize: 12, marginTop: 8 }}>adivina el año de la canción</p>
+          <p style={{ color: "#8a8a8a", fontSize: 12, marginTop: 8 }}>adivina el año de la canción</p>
         </div>
         <button style={{ ...S.btnGold, marginBottom: 12 }} onClick={() => setPantalla("crear")}>Crear sala</button>
         <button style={{ ...S.btn, marginBottom: 12 }} onClick={() => setPantalla("unir")}>Unirme con un código</button>
@@ -57,7 +57,7 @@ export default function LobbyRocola({ uid, onEntrar, onVolverAlMenu, codigoInici
   if (pantalla === "crear") return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Crear sala</h2>
-      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>Tú serás el anfitrión de la partida</p>
+      <p style={{ color: "#8a8a8a", fontSize: 13, margin: "0 0 20px" }}>Tú serás el anfitrión de la partida</p>
       <label style={S.fieldLabel} htmlFor="nombre-crear-ro">Tu nombre</label>
       <input id="nombre-crear-ro" style={{ ...S.input, width: "100%", marginBottom: 16 }} placeholder="Ej. Jorge" value={nombre}
         onChange={(e) => setNombre(e.target.value)} maxLength={12} />
@@ -81,7 +81,7 @@ export default function LobbyRocola({ uid, onEntrar, onVolverAlMenu, codigoInici
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
       {codigoInicial && <InvitacionJuego emoji="🎶" nombre="Rocola" />}
       <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: "0 0 4px" }}>Unirme a una sala</h2>
-      <p style={{ color: "#7a7a7a", fontSize: 13, margin: "0 0 20px" }}>
+      <p style={{ color: "#8a8a8a", fontSize: 13, margin: "0 0 20px" }}>
         {codigoInicial ? "Te invitaron a esta partida — solo falta tu nombre" : "Pide el código de 4 dígitos a quien creó la sala"}
       </p>
       <label style={S.fieldLabel} htmlFor="nombre-unir-ro">Tu nombre</label>

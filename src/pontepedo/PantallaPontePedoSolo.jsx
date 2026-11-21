@@ -80,13 +80,13 @@ export default function PantallaPontePedoSolo({ onSalir }) {
   return (
     <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 380, margin: "0 auto 4px" }}>
-        <span style={{ background: "#222", color: "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>🍻 Modo solo</span>
-        <span style={{ fontSize: 12, color: "#7a7a7a", fontWeight: 700 }}>Pásense el celular</span>
+        <span style={{ background: "#222", color: "#888", fontSize: 12, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>🍻 Modo solo</span>
+        <span style={{ fontSize: 12, color: "#8a8a8a", fontWeight: 700 }}>Pásense el celular</span>
       </div>
       <div style={{ marginTop: 10 }}>
         <ComoSeJuega storageKey="pontepedo_reglas_vistas" texto={'Cualquiera saca carta y todos ven el mismo reto — pasen el celular o júntense alrededor de una pantalla. Cada carta tiene su propia regla (toca "Ver todas las reglas" para verlas todas de un jalón antes de empezar).'} />
       </div>
-      <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 11, textDecoration: "underline", cursor: "pointer", alignSelf: "center", margin: "0 0 0" }}
+      <button style={{ background: "none", border: "none", color: "#8a8a8a", fontSize: 13, textDecoration: "underline", cursor: "pointer", minHeight: 44, padding: "12px 10px", alignSelf: "center", margin: "0 0 0" }}
         onClick={() => setVerReglas(true)}>📋 Ver todas las reglas</button>
 
       {editandoRegla ? (
@@ -99,12 +99,12 @@ export default function PantallaPontePedoSolo({ onSalir }) {
         </div>
       ) : reglaActiva ? (
         <div style={{ background: "#1a1000", border: "1px solid #ffd700", borderRadius: 12, padding: "10px 14px", margin: "10px 0 14px", width: "100%", maxWidth: 380, boxSizing: "border-box", display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 10, color: "#ffd700", fontWeight: 800, flexShrink: 0 }}>📜 REGLA</span>
+          <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 800, flexShrink: 0 }}>📜 REGLA</span>
           <span style={{ fontSize: 13, color: "#fff", flex: 1 }}>{reglaActiva}</span>
-          <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 11, textDecoration: "underline", cursor: "pointer", flexShrink: 0 }} onClick={abrirEditorRegla}>editar</button>
+          <button style={{ background: "none", border: "none", color: "#8a8a8a", fontSize: 13, textDecoration: "underline", cursor: "pointer", minHeight: 44, padding: "12px 10px", flexShrink: 0 }} onClick={abrirEditorRegla}>editar</button>
         </div>
       ) : (
-        <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 11, textDecoration: "underline", cursor: "pointer", margin: "10px 0 14px" }} onClick={abrirEditorRegla}>
+        <button style={{ background: "none", border: "none", color: "#8a8a8a", fontSize: 13, textDecoration: "underline", cursor: "pointer", minHeight: 44, padding: "12px 10px", margin: "10px 0 14px" }} onClick={abrirEditorRegla}>
           + escribir la regla activa
         </button>
       )}
@@ -124,18 +124,18 @@ export default function PantallaPontePedoSolo({ onSalir }) {
             </div>
           </div>
         ) : (
-          <p style={{ color: "#7a7a7a", fontSize: 14, textAlign: "center" }}>Nadie ha sacado carta todavía</p>
+          <p style={{ color: "#8a8a8a", fontSize: 14, textAlign: "center" }}>Nadie ha sacado carta todavía</p>
         )}
       </div>
 
       <div style={{ width: "100%", maxWidth: 380, margin: "0 auto" }}>
-        <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", margin: "0 0 10px" }}>Quedan {mazo.length} cartas en el mazo</p>
+        <p style={{ color: "#8a8a8a", fontSize: 12, textAlign: "center", margin: "0 0 10px" }}>Quedan {mazo.length} cartas en el mazo</p>
         <button style={{ ...S.btnGold, opacity: sacando ? 0.6 : 1 }} disabled={sacando} onClick={sacarCarta}>
           {sacando ? "SACANDO…" : "🃏 SACAR CARTA"}
         </button>
         <div style={{ textAlign: "center", display: "flex", justifyContent: "center", gap: 14, marginTop: 18 }}>
-          <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer" }} onClick={() => setConfirmarReinicio(true)}>Barajar de nuevo</button>
-          <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer" }} onClick={onSalir}>← Menú</button>
+          <button style={{ background: "none", border: "none", color: "#8a8a8a", fontSize: 13, textDecoration: "underline", cursor: "pointer", minHeight: 44, padding: "12px 10px" }} onClick={() => setConfirmarReinicio(true)}>Barajar de nuevo</button>
+          <button style={{ background: "none", border: "none", color: "#8a8a8a", fontSize: 13, textDecoration: "underline", cursor: "pointer", minHeight: 44, padding: "12px 10px" }} onClick={onSalir}>← Menú</button>
         </div>
       </div>
     </div>

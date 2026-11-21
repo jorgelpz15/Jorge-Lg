@@ -2,11 +2,13 @@ import {
   doc, setDoc, onSnapshot, runTransaction, serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../firebase.js";
-import { generarCodigoUnico, latirPresenciaComun, quitarJugadorTx } from "../shared/salaComun.js";
+import {
+  generarCodigoUnico, latirPresenciaComun, quitarJugadorTx, salirDeSalaComun, jugadoresParaRevancha,
+} from "../shared/salaComun.js";
 import { CANCIONES } from "./canciones.js";
 
 export const OPCIONES_RONDAS = [3, 5, 10];
-export const ERAS = ["80s", "90s", "2000s", "hoy"];
+export const ERAS = ["70s", "80s", "90s", "2000s", "hoy"];
 
 function salaRef(codigo) {
   return doc(db, "salasRocola", codigo);
@@ -42,7 +44,7 @@ export async function unirseSala(codigo, nombre, uid) {
     if (sala.fase !== "espera") throw new Error("SALA_YA_EMPEZO");
     if (Object.keys(jugadores).length >= 8) throw new Error("SALA_LLENA");
     const nombreExiste = Object.values(jugadores).some(
-      (j) => j.nombre.toLowerCase() === nombre.trim().toLowerCase()
+      (j) => (j.nombre || "").toLowerCase() === nombre.trim().toLowerCase()
     );
     if (nombreExiste) throw new Error("NOMBRE_REPETIDO");
     tx.update(ref, { [`jugadores.${uid}`]: jugadorNuevo(nombre) });
@@ -172,20 +174,25 @@ export async function avanzar(codigo) {
 
 // Revancha en la MISMA sala: todos los que siguen dentro vuelven solos a la
 // sala de espera (por el listener) con marcadores en cero.
-export async function jugarOtraVez(codigo) {
+export async function jugarOtraVez(codigo, uid) {
   const ref = salaRef(codigo);
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(ref);
     if (!snap.exists()) return;
     const sala = snap.data();
-    if (sala.fase !== "fin") return;
+    if (sala.fase !== "fin" || !sala.jugadores[uid]) return;
+    const { jugadores: quedan, anfitrion } = jugadoresParaRevancha(sala, uid);
     const jugadores = {};
-    Object.entries(sala.jugadores).forEach(([u, j]) => {
+    Object.entries(quedan).forEach(([u, j]) => {
       jugadores[u] = { ...j, rondasGanadas: 0, errorTotal: 0 };
     });
     tx.update(ref, {
-      jugadores, orden: [], ronda: 0, fase: "espera",
+      jugadores, anfitrion, orden: [], ronda: 0, fase: "espera",
       cancionActual: null, respuestas: {}, ultimaRonda: null, cancionesUsadas: [],
     });
   });
+}
+
+export async function salirDeSala(codigo, uid) {
+  await salirDeSalaComun(salaRef(codigo), uid);
 }

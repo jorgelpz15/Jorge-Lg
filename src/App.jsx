@@ -1,19 +1,26 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { esperarMiUid, configuracionValida } from "./firebase";
 import { escucharSala, latirPresencia } from "./sala";
 import { S } from "./styles";
 import SelectorJuegos from "./SelectorJuegos";
-import Lobby from "./Lobby";
-import Game from "./Game";
-import RebanarApp from "./rebanar/RebanarApp.jsx";
-import SemaforoApp from "./semaforo/SemaforoApp.jsx";
-import DadosApp from "./dados/DadosApp.jsx";
-import PontePedoApp from "./pontepedo/PontePedoApp.jsx";
-import RocolaApp from "./rocola/RocolaApp.jsx";
 import CargandoDado from "./CargandoDado";
+import { useLatido } from "./shared/useLatido.js";
+
+// Cada juego se descarga solo cuando alguien lo elige: el menú abre con una
+// fracción del código (y los mazos de CAH no viajan si juegas otra cosa).
+const Lobby = lazy(() => import("./Lobby"));
+const Game = lazy(() => import("./Game"));
+const RebanarApp = lazy(() => import("./rebanar/RebanarApp.jsx"));
+const SemaforoApp = lazy(() => import("./semaforo/SemaforoApp.jsx"));
+const DadosApp = lazy(() => import("./dados/DadosApp.jsx"));
+const PontePedoApp = lazy(() => import("./pontepedo/PontePedoApp.jsx"));
+const RocolaApp = lazy(() => import("./rocola/RocolaApp.jsx"));
+
+function Cargando({ onVolver }) {
+  return <div style={S.page}><CargandoDado onVolver={onVolver} /></div>;
+}
 
 const CLAVE_LOCAL = "cah_sesion";
-const LATIDO_MS = 20000;
 
 const JUEGOS_VALIDOS = ["cah", "rebanar", "semaforo", "dados", "pontepedo", "rocola"];
 
@@ -40,7 +47,8 @@ export default function App() {
 
   useEffect(() => {
     if (!configuracionValida) return;
-    esperarMiUid().then((u) => {
+    esperarMiUid().catch(() => { setErrorSala("No se pudo conectar. Revisa tu señal e intenta de nuevo."); return null; }).then((u) => {
+      if (!u) return;
       setUid(u);
       // Un link de invitación (?codigo=1234) manda sobre una sesión guardada vieja.
       if (codigoInicial) {
@@ -78,11 +86,7 @@ export default function App() {
 
   // Avisa "sigo aquí" cada 20s mientras el celular está dentro de una sala,
   // para que los demás vean quién sigue conectado en la sala de espera.
-  useEffect(() => {
-    if (!codigo || !uid || !sala) return;
-    const t = setInterval(() => latirPresencia(codigo, uid), LATIDO_MS);
-    return () => clearInterval(t);
-  }, [codigo, uid, sala != null]);
+  useLatido(Boolean(codigo && uid && sala), () => latirPresencia(codigo, uid));
 
   function handleEntrar(codigoNuevo) {
     localStorage.setItem(CLAVE_LOCAL, JSON.stringify({ codigo: codigoNuevo }));
@@ -117,6 +121,21 @@ export default function App() {
     );
   }
 
+  if (errorSala) {
+    return (
+      <div style={S.page}>
+        <div style={S.card} role="alert">
+          <div style={{ fontSize: 44, marginBottom: 8 }}>📡</div>
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#fff", margin: "0 0 10px" }}>Sin conexión</h2>
+          <p style={{ color: "#999", fontSize: 13, lineHeight: 1.5, margin: "0 0 20px" }}>{errorSala}</p>
+          <button style={S.btn} onClick={() => location.reload()}>Reintentar</button>
+          <button style={{ ...S.navBtn, width: "100%", marginTop: 10 }}
+            onClick={() => { setErrorSala(null); handleVolverAlMenu(); }}>← Volver al menú</button>
+        </div>
+      </div>
+    );
+  }
+
   if (!uid) {
     return (
       <div style={S.page}>
@@ -130,36 +149,36 @@ export default function App() {
   }
 
   if (juego === "rebanar") {
-    return <RebanarApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} />;
+    return <Suspense fallback={<Cargando onVolver={() => setJuego(null)} />}><RebanarApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} /></Suspense>;
   }
 
   if (juego === "semaforo") {
-    return <SemaforoApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} />;
+    return <Suspense fallback={<Cargando onVolver={() => setJuego(null)} />}><SemaforoApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} /></Suspense>;
   }
 
   if (juego === "dados") {
-    return <DadosApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} />;
+    return <Suspense fallback={<Cargando onVolver={() => setJuego(null)} />}><DadosApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} /></Suspense>;
   }
 
   if (juego === "pontepedo") {
-    return <PontePedoApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} />;
+    return <Suspense fallback={<Cargando onVolver={() => setJuego(null)} />}><PontePedoApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} /></Suspense>;
   }
 
   if (juego === "rocola") {
-    return <RocolaApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} />;
+    return <Suspense fallback={<Cargando onVolver={() => setJuego(null)} />}><RocolaApp uid={uid} onVolverAlMenu={() => setJuego(null)} codigoInicial={codigoInicial} /></Suspense>;
   }
 
   if (!codigo) {
-    return <Lobby uid={uid} onEntrar={handleEntrar} codigoInicial={codigoInicial} onVolverAlMenu={handleVolverAlMenu} />;
+    return <Suspense fallback={<Cargando onVolver={handleVolverAlMenu} />}><Lobby uid={uid} onEntrar={handleEntrar} codigoInicial={codigoInicial} onVolverAlMenu={handleVolverAlMenu} /></Suspense>;
   }
 
   if (!sala) {
     return (
       <div style={S.page}>
-        <CargandoDado texto="Entrando a la sala…" />
+        <CargandoDado texto="Entrando a la sala…" onVolver={handleVolverAlMenu} />
       </div>
     );
   }
 
-  return <Game sala={sala} uid={uid} codigo={codigo} onSalir={handleSalir} />;
+  return <Suspense fallback={<Cargando onVolver={handleVolverAlMenu} />}><Game sala={sala} uid={uid} codigo={codigo} onSalir={handleSalir} /></Suspense>;
 }

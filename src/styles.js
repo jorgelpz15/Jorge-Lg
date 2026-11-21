@@ -11,11 +11,11 @@ const SOMBRA = {
 };
 
 export const S = {
-  page: { minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20, fontFamily: "'Helvetica Neue',Arial,sans-serif", color: "#fff", boxSizing: "border-box" },
+  page: { minHeight: "100dvh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20, fontFamily: "'Helvetica Neue',Arial,sans-serif", color: "#fff", boxSizing: "border-box" },
   btn: { width: "100%", padding: "15px 20px", fontSize: 16, fontWeight: 900, background: "#fff", color: "#000", border: "none", borderRadius: 12, cursor: "pointer", letterSpacing: 1, textTransform: "uppercase", boxShadow: SOMBRA.boton },
   btnGold: { width: "100%", padding: "16px 20px", fontSize: 15, fontWeight: 900, background: "#ffd700", color: "#000", border: "none", borderRadius: 12, cursor: "pointer", letterSpacing: 1, textTransform: "uppercase", boxShadow: `${SOMBRA.boton}, ${SOMBRA.dorada}` },
   btnSm: { padding: "12px 16px", fontSize: 14, fontWeight: 800, background: "#fff", color: "#000", border: "none", borderRadius: 10, cursor: "pointer", boxShadow: SOMBRA.botonPeq },
-  input: { padding: "13px 14px", fontSize: 15, background: "#1a1a1a", border: "2px solid #333", borderRadius: 10, color: "#fff", outline: "none" },
+  input: { padding: "13px 14px", fontSize: 16, background: "#1a1a1a", border: "2px solid #333", borderRadius: 10, color: "#fff", outline: "none" },
   fieldLabel: { display: "block", color: "#888", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 6px" },
   chip: { display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", background: "#1a1a1a", border: "1px solid #333", borderRadius: 100, boxShadow: SOMBRA.ambientalSuave },
   scoreBtn: { width: 44, height: 44, borderRadius: 10, border: "2px solid #333", background: "transparent", color: "#888", fontSize: 16, fontWeight: 700, cursor: "pointer" },

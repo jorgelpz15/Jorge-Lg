@@ -4,17 +4,12 @@ import {
   iniciarEleccionDeInicio, elegirQuienEmpieza, enviarRespuesta, cambiarMano,
   avanzarRevelacion, iniciarVotacion, votar, enviarShot, cerrarShotActivo,
   siguienteRonda, terminarJuego, salirDeSalaEnEspera, otraRondaLibre,
-  jugarOtraVez,
+  jugarOtraVez, salirDeSala,
 } from "./sala";
 import ComoSeJuega from "./ComoSeJuega";
+import { estaConectado } from "./shared/presencia.js";
+import BotonSalir from "./shared/BotonSalir.jsx";
 
-const MARGEN_DESCONEXION_MS = 45000; // heartbeat cada 20s (ver App.jsx), doble de margen
-
-function estaConectado(visto, ahora) {
-  if (!visto) return true; // el timestamp del servidor todavía no llega, es un jugador recién unido
-  const ms = typeof visto.toMillis === "function" ? visto.toMillis() : 0;
-  return ahora - ms < MARGEN_DESCONEXION_MS;
-}
 
 function renderB(text, ans) {
   const hasBlank = text.includes("_");
@@ -65,6 +60,8 @@ export default function Game({ sala, uid, codigo, onSalir }) {
   const [selected, setSelected] = useState([]);
   const [mostrarRefresh, setMostrarRefresh] = useState(false);
   const [vistaShotMgr, setVistaShotMgr] = useState(false);
+  // El panel de mandar shots no debe sobrevivir a un cambio de fase o de ronda.
+  useEffect(() => { setVistaShotMgr(false); }, [sala.fase, sala.ronda]);
   const [copiado, setCopiado] = useState(false);
   const [ahora, setAhora] = useState(() => Date.now());
   const [confirmarSalida, setConfirmarSalida] = useState(false);
@@ -107,13 +104,6 @@ export default function Game({ sala, uid, codigo, onSalir }) {
   async function confirmarSalir() {
     if (sala.fase === "espera") await salirDeSalaEnEspera(codigo, uid);
     onSalir();
-  }
-
-  function BotonSalir() {
-    return (
-      <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 12, textDecoration: "underline", cursor: "pointer", marginTop: 18 }}
-        onClick={() => setConfirmarSalida(true)}>Salir de la sala</button>
-    );
   }
 
   function toggleCard(card) {
@@ -176,7 +166,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
     const conectados = entradas.filter(([, j]) => estaConectado(j.visto, ahora)).length;
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "36px 20px" }}>
-        <p style={{ color: "#7a7a7a", fontSize: 12, letterSpacing: 3, textTransform: "uppercase", textAlign: "center", margin: "0 0 4px" }}>Código de la sala</p>
+        <p style={{ color: "#8a8a8a", fontSize: 12, letterSpacing: 3, textTransform: "uppercase", textAlign: "center", margin: "0 0 4px" }}>Código de la sala</p>
         <div style={{ ...S.codeBox, alignSelf: "center" }}>{sala.codigo}</div>
         <p style={{ color: "#ffd700", fontSize: 12, textAlign: "center", margin: "0 0 16px" }}>{sala.idioma === "en" ? "🇺🇸 Cartas en inglés" : "🇲🇽 Cartas en español"}</p>
         <button style={{ ...S.btnSm, alignSelf: "center", background: "#1a1a1a", color: "#ffd700", border: "1px solid #333", marginBottom: 20 }}
@@ -188,7 +178,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
             return (
               <div key={u} style={{ ...S.chip, justifyContent: "space-between", opacity: online ? 1 : 0.5 }}>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>
-                  <span style={{ color: online ? "#4caf50" : "#7a7a7a" }}>●</span> {j.nombre}
+                  <span style={{ color: online ? "#4caf50" : "#8a8a8a" }}>●</span> {j.nombre}
                   {u === sala.anfitrion && " 👑"}
                 </span>
                 {!online && <span style={{ color: "#888", fontSize: 11 }}>desconectado</span>}
@@ -199,9 +189,9 @@ export default function Game({ sala, uid, codigo, onSalir }) {
         <ComoSeJuega storageKey="cah_reglas_vistas" texto={'Sale una carta negra con un espacio en blanco (o dos si dice "ELIGE 2"). Completa el hueco con tu carta blanca más chistosa u oscura. Todos votan por la mejor combinación — quien gana se lleva una ⭐ (dos en ronda dorada).'} />
         <button style={{ ...S.btn, opacity: entradas.length >= 2 ? 1 : 0.3 }} disabled={entradas.length < 2}
           onClick={() => iniciarEleccionDeInicio(codigo)}>¡ARMAR JUEGO! ({entradas.length})</button>
-        {entradas.length < 2 && <p style={{ color: "#7a7a7a", fontSize: 11, textAlign: "center", marginTop: 8 }}>Se necesitan mínimo 2 jugadores</p>}
-        {entradas.length === 2 && <p style={{ color: "#ffd700", fontSize: 11, textAlign: "center", marginTop: 8 }}>🎲 Modo libre: solo para reír, sin puntos ni votos</p>}
-        <div style={{ textAlign: "center" }}><BotonSalir /></div>
+        {entradas.length < 2 && <p style={{ color: "#8a8a8a", fontSize: 12, textAlign: "center", marginTop: 8 }}>Se necesitan mínimo 2 jugadores</p>}
+        {entradas.length === 2 && <p style={{ color: "#ffd700", fontSize: 12, textAlign: "center", marginTop: 8 }}>🎲 Modo libre: solo para reír, sin puntos ni votos</p>}
+        <div style={{ textAlign: "center" }}><BotonSalir onClick={() => setConfirmarSalida(true)} /></div>
       </div>
     );
   }
@@ -215,9 +205,9 @@ export default function Game({ sala, uid, codigo, onSalir }) {
           <h2 style={{ fontSize: 20, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>¿Quién empieza?</h2>
           <div style={{ width: 36, height: 2, background: "#333", margin: "16px auto" }} />
           <p style={{ fontSize: 22, fontWeight: 900, color: "#ffd700", lineHeight: 1.3, margin: "0 0 20px" }}>{sala.retoInicial}</p>
-          <p style={{ color: "#7a7a7a", fontSize: 12, margin: "0 0 16px" }}>Si esto te describe a ti, toca el botón</p>
+          <p style={{ color: "#8a8a8a", fontSize: 12, margin: "0 0 16px" }}>Si esto te describe a ti, toca el botón</p>
           <button style={S.btnGold} onClick={() => elegirQuienEmpieza(codigo, uid)}>¡SOY YO, EMPIEZO!</button>
-          <BotonSalir />
+          <BotonSalir onClick={() => setConfirmarSalida(true)} />
         </div>
       </div>
     );
@@ -242,7 +232,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
                 <span key={u} style={{ ...S.chip, opacity: sala.respuestas[u] ? 1 : 0.35 }}>{nombre(u)} {sala.respuestas[u] ? "✓" : "…"}</span>
               ))}
             </div>
-            <BotonSalir />
+            <BotonSalir onClick={() => setConfirmarSalida(true)} />
           </div>
         </div>
       );
@@ -252,35 +242,35 @@ export default function Game({ sala, uid, codigo, onSalir }) {
       <div style={{ ...S.page, justifyContent: "flex-start", padding: 0 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderBottom: "1px solid #1a1a1a", width: "100%", boxSizing: "border-box" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ background: sala.esRondaDorada ? "#ffd700" : "#222", color: sala.esRondaDorada ? "#000" : "#888", fontSize: 11, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>R{sala.ronda}{sala.esRondaDorada ? " ×2" : ""}</span>
+            <span style={{ background: sala.esRondaDorada ? "#ffd700" : "#222", color: sala.esRondaDorada ? "#000" : "#888", fontSize: 12, fontWeight: 700, padding: "3px 7px", borderRadius: 6 }}>R{sala.ronda}{sala.esRondaDorada ? " ×2" : ""}</span>
             <span style={{ fontSize: 16, fontWeight: 900, color: "#fff" }}>{yo.nombre}</span>
           </div>
           {sala.modoLibre
-            ? <span style={{ fontSize: 11, color: "#ffd700", fontWeight: 700 }}>🎲 Libre</span>
+            ? <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>🎲 Libre</span>
             : <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>⭐{yo.estrellas || 0}</span>}
         </div>
         <div style={{ background: sala.esRondaDorada ? "linear-gradient(135deg,#1a1500,#000)" : "#000", margin: "10px 14px", padding: "18px 16px", borderRadius: 14, border: sala.esRondaDorada ? "2px solid #ffd700" : "2px solid #333", position: "relative" }}>
           <p style={{ color: "#fff", fontSize: 18, fontWeight: 700, lineHeight: 1.4, margin: 0 }}>{renderB(sala.cartaNegra.text)}</p>
-          {need > 1 && <span style={{ position: "absolute", bottom: 8, right: 12, background: "#fff", color: "#000", fontSize: 10, fontWeight: 900, padding: "2px 7px", borderRadius: 5 }}>ELIGE {need}</span>}
+          {need > 1 && <span style={{ position: "absolute", bottom: 8, right: 12, background: "#fff", color: "#000", fontSize: 12, fontWeight: 900, padding: "2px 7px", borderRadius: 5 }}>ELIGE {need}</span>}
           {sala.esRondaDorada && <span style={{ position: "absolute", top: 8, right: 12, fontSize: 16 }}>🏆</span>}
         </div>
         {need > 1 && (
           <div style={{ display: "flex", gap: 6, margin: "0 14px 6px" }}>
             {Array.from({ length: need }).map((_, i) => (
               <div key={i} style={{ flex: 1, padding: "8px 6px", borderRadius: 8, border: selected[i] ? "2px solid #ffd700" : "2px dashed #333", background: selected[i] ? "rgba(255,215,0,0.05)" : "transparent", textAlign: "center", minHeight: 36, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ color: selected[i] ? "#ffd700" : "#7a7a7a", fontSize: 11, fontWeight: 600 }}>{selected[i] || `Carta ${i + 1}`}</span>
+                <span style={{ color: selected[i] ? "#ffd700" : "#8a8a8a", fontSize: 12, fontWeight: 600 }}>{selected[i] || `Carta ${i + 1}`}</span>
               </div>
             ))}
           </div>
         )}
         <div style={{ flex: 1, overflow: "hidden" }}>
-          <div style={{ padding: "6px 14px 14px", overflowY: "auto", maxHeight: "calc(100vh - 340px)", display: "flex", flexDirection: "column", gap: 5 }}>
+          <div style={{ padding: "6px 14px 14px", overflowY: "auto", maxHeight: "calc(100dvh - 340px)", display: "flex", flexDirection: "column", gap: 5 }}>
             {mano.map((card, i) => {
               const sel = selected.includes(card);
               const si = selected.indexOf(card);
               return (
                 <button key={i} style={{ background: sel ? "#ffd700" : "#fff", border: "none", borderRadius: 10, padding: "12px 14px", textAlign: "left", cursor: "pointer", position: "relative", display: "block", width: "100%", transform: sel ? "scale(0.97)" : "none", boxShadow: sel ? "0 0 0 3px rgba(255,215,0,0.3), 0 0 20px rgba(255,215,0,0.35)" : "0 8px 20px rgba(0,0,0,0.35)" }} onClick={() => toggleCard(card)}>
-                  {sel && <span style={{ position: "absolute", top: -5, right: -3, background: "#000", color: "#ffd700", width: 20, height: 20, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900 }}>{si + 1}</span>}
+                  {sel && <span style={{ position: "absolute", top: -5, right: -3, background: "#000", color: "#ffd700", width: 20, height: 20, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900 }}>{si + 1}</span>}
                   <span style={{ color: "#000", fontSize: 14, fontWeight: 700, lineHeight: 1.3 }}>{card}</span>
                 </button>
               );
@@ -299,7 +289,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
             </div>
           )}
           <div style={{ display: "flex", gap: 8 }}>
-            {!mostrarRefresh && <button style={{ ...S.btnSm, background: "#222", color: "#aaa", fontSize: 11, padding: "12px 10px", flex: "0 0 auto" }} onClick={() => setMostrarRefresh(true)}>🔄 -1⭐</button>}
+            {!mostrarRefresh && <button style={{ ...S.btnSm, background: "#222", color: "#aaa", fontSize: 12, padding: "12px 10px", flex: "0 0 auto" }} onClick={() => setMostrarRefresh(true)}>🔄 -1⭐</button>}
             <button style={{ ...S.btnGold, flex: 1, opacity: selected.length === need && !enviandoRespuesta ? 1 : 0.3 }} disabled={selected.length !== need || enviandoRespuesta} onClick={confirmarRespuesta}>{enviandoRespuesta ? "ENVIANDO…" : "CONFIRMAR"}</button>
           </div>
         </div>
@@ -313,7 +303,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "28px 18px" }}>
         <h2 style={{ fontSize: 24, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 4px" }}>Respuestas</h2>
-        <p style={{ textAlign: "center", color: "#7a7a7a", fontSize: 13, margin: "0 0 16px" }}>{sala.revIdx + 1} de {sala.revSubs.length}</p>
+        <p style={{ textAlign: "center", color: "#8a8a8a", fontSize: 13, margin: "0 0 16px" }}>{sala.revIdx + 1} de {sala.revSubs.length}</p>
         <div style={{ background: "#000", padding: "22px 18px", borderRadius: 14, border: "2px solid #333", marginBottom: 16 }}>
           <p key={sala.revIdx} className="fade-in-fast" style={{ color: "#fff", fontSize: 19, fontWeight: 700, lineHeight: 1.4, margin: 0 }}>{cur ? renderB(sala.cartaNegra.text, cur.cartas) : ""}</p>
         </div>
@@ -325,7 +315,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
               ? <button style={S.btnGold} onClick={() => otraRondaLibre(codigo)}>Otra ronda 😂</button>
               : <button style={S.btnGold} onClick={() => iniciarVotacion(codigo)}>¡A VOTAR!</button>}
         </div>
-        <div style={{ textAlign: "center" }}><BotonSalir /></div>
+        <div style={{ textAlign: "center" }}><BotonSalir onClick={() => setConfirmarSalida(true)} /></div>
       </div>
     );
   }
@@ -341,7 +331,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
             <div style={{ fontSize: 44, marginBottom: 8 }}>🗳️</div>
             <h2 style={{ fontSize: 18, fontWeight: 800, color: "#4caf50", margin: "0 0 10px" }}>Voto enviado, esperando a los demás…</h2>
             <p style={{ color: "#888", fontSize: 12 }}>{votaron} de {sala.orden.length} ya votaron</p>
-            <BotonSalir />
+            <BotonSalir onClick={() => setConfirmarSalida(true)} />
           </div>
         </div>
       );
@@ -349,7 +339,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
     return (
       <div style={{ ...S.page, justifyContent: "flex-start", padding: "24px 16px" }}>
         <h2 style={{ fontSize: 22, fontWeight: 900, color: "#fff", textAlign: "center", margin: "0 0 2px" }}>Vota, {yo.nombre}</h2>
-        <p style={{ textAlign: "center", color: "#7a7a7a", fontSize: 12, margin: "0 0 14px", fontStyle: "italic" }}>No puedes votar por ti mismo</p>
+        <p style={{ textAlign: "center", color: "#8a8a8a", fontSize: 12, margin: "0 0 14px", fontStyle: "italic" }}>No puedes votar por ti mismo</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%" }}>
           {sala.revSubs.map(({ uid: pUid, cartas }, i) => (
             <button key={i} style={{ background: "#111", border: "2px solid #222", borderRadius: 12, padding: 14, textAlign: "left", cursor: "pointer", opacity: pUid === uid ? 0.25 : 1, pointerEvents: pUid === uid ? "none" : "auto" }}
@@ -374,7 +364,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
           <p style={{ color: "#888", fontSize: 13, margin: "0 0 6px" }}>Tienes {yo.shotsDisponibles || 0} disponible{(yo.shotsDisponibles || 0) > 1 ? "s" : ""}</p>
           {rec && (
             <div style={{ background: "#1a1000", borderRadius: 10, padding: "10px 14px", border: "1px solid #333", margin: "12px 0 16px" }}>
-              <p style={{ color: "#ffd700", fontSize: 11, fontWeight: 700, margin: "0 0 2px", textTransform: "uppercase", letterSpacing: 1 }}>💡 Recomendación</p>
+              <p style={{ color: "#ffd700", fontSize: 12, fontWeight: 700, margin: "0 0 2px", textTransform: "uppercase", letterSpacing: 1 }}>💡 Recomendación</p>
               <p style={{ color: "#fff", fontSize: 15, fontWeight: 800, margin: "0 0 2px" }}>{nombre(rec.uid)}</p>
               <p style={{ color: "#999", fontSize: 12, margin: 0 }}>{rec.razon}</p>
             </div>
@@ -384,7 +374,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
               <button key={t} style={{ ...S.nameBtn, border: rec?.uid === t ? "2px solid #ffd700" : "1px solid #333" }}
                 onClick={() => { enviarShot(codigo, uid, t); setVistaShotMgr(false); }}>
                 <span>🍺 → {nombre(t)}</span>
-                <span style={{ color: "#7a7a7a", fontSize: 11, marginLeft: 8 }}>{sala.jugadores[t]?.segundosBebidos || 0}s bebidos</span>
+                <span style={{ color: "#8a8a8a", fontSize: 12, marginLeft: 8 }}>{sala.jugadores[t]?.segundosBebidos || 0}s bebidos</span>
                 {rec?.uid === t && <span style={{ marginLeft: 4 }}>⭐</span>}
               </button>
             ))}
@@ -410,7 +400,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
           {ur.ganadores[0] && (sala.jugadores[ur.ganadores[0]]?.racha || 0) >= 2 && <p style={{ color: "#ff6b35", fontSize: 12, fontWeight: 700, margin: "4px 0 0" }}>🔥 Racha de {sala.jugadores[ur.ganadores[0]].racha}</p>}
         </div>
         <div style={{ background: "#111", borderRadius: 12, padding: "12px 14px", border: "1px solid #222" }}>
-          <p style={{ color: "#888", fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: "0 0 8px" }}>¿Quién jugó qué?</p>
+          <p style={{ color: "#888", fontSize: 12, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: "0 0 8px" }}>¿Quién jugó qué?</p>
           {sala.revSubs.map(({ uid: pUid, cartas }, i) => (
             <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 8 }}>
               <span style={{ color: ur.ganadores.includes(pUid) ? "#ffd700" : "#888", fontWeight: 800, fontSize: 13, minWidth: 60 }}>{nombre(pUid)}</span>
@@ -424,9 +414,9 @@ export default function Game({ sala, uid, codigo, onSalir }) {
               <span style={{ fontSize: 16, width: 26, textAlign: "center" }}>{i === 0 ? "👑" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}</span>
               <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: "#fff" }}>{j.nombre}</span>
               <span style={{ fontSize: 12, color: "#ffd700", fontWeight: 700 }}>⭐{j.estrellas || 0}</span>
-              {(j.segundosBebidos || 0) > 0 && <span style={{ fontSize: 11, color: "#ff8800" }}>{j.segundosBebidos}s🍺</span>}
-              {(j.racha || 0) >= 2 && <span style={{ fontSize: 11, color: "#ff6b35" }}>🔥{j.racha}</span>}
-              {(j.shotsDisponibles || 0) > 0 && <span style={{ fontSize: 11, color: "#ff4444" }}>🍺{j.shotsDisponibles}</span>}
+              {(j.segundosBebidos || 0) > 0 && <span style={{ fontSize: 12, color: "#ff8800" }}>{j.segundosBebidos}s🍺</span>}
+              {(j.racha || 0) >= 2 && <span style={{ fontSize: 12, color: "#ff6b35" }}>🔥{j.racha}</span>}
+              {(j.shotsDisponibles || 0) > 0 && <span style={{ fontSize: 12, color: "#ff4444" }}>🍺{j.shotsDisponibles}</span>}
             </div>
           ))}
         </div>
@@ -448,7 +438,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
                 <p key={u} style={{ color: "#aaa", fontSize: 13, margin: "0 0 6px" }}>{j.nombre} tiene {j.shotsDisponibles} shot{j.shotsDisponibles > 1 ? "s" : ""} pendiente{j.shotsDisponibles > 1 ? "s" : ""}</p>
               );
             })}
-            <p style={{ color: "#7a7a7a", fontSize: 11, margin: "6px 0 0", fontStyle: "italic" }}>Se pueden guardar para después</p>
+            <p style={{ color: "#8a8a8a", fontSize: 12, margin: "6px 0 0", fontStyle: "italic" }}>Se pueden guardar para después</p>
           </div>
         )}
         <div style={{ display: "flex", gap: 8 }}>
@@ -457,7 +447,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
           </button>
           <button style={{ ...S.btnSm, background: "#1a0000", color: "#ff4444", border: "1px solid #ff4444", padding: "14px 12px" }} disabled={cargandoSiguienteRonda} onClick={() => terminarJuego(codigo)}>FIN</button>
         </div>
-        <div style={{ textAlign: "center" }}><BotonSalir /></div>
+        <div style={{ textAlign: "center" }}><BotonSalir onClick={() => setConfirmarSalida(true)} /></div>
       </div>
     );
   }
@@ -471,10 +461,17 @@ export default function Game({ sala, uid, codigo, onSalir }) {
     const masBorracho = [...entries].sort((a, b) => (b[1].segundosBebidos || 0) - (a[1].segundosBebidos || 0))[0];
     const masSobrio = entries.filter(([, j]) => (j.segundosBebidos || 0) > 0).sort((a, b) => (a[1].segundosBebidos || 0) - (b[1].segundosBebidos || 0))[0];
 
+    async function salirDelFin() {
+      // Salir de verdad (no solo cerrar la sesión local), para no dejar un
+      // jugador fantasma si el grupo arma una revancha.
+      try { await salirDeSala(codigo, uid); } catch { /* sin red: igual lo sacamos de la pantalla */ }
+      onSalir();
+    }
+
     async function alJugarOtraVez() {
       setCargandoRevancha(true);
       try {
-        await jugarOtraVez(codigo);
+        await jugarOtraVez(codigo, uid);
       } finally {
         setCargandoRevancha(false);
       }
@@ -485,7 +482,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
         <div style={{ textAlign: "center" }}>
           <div className="pop-in" style={{ fontSize: 64, marginBottom: 4 }}>🏆</div>
           <h1 className="fade-rise" style={{ fontSize: 32, fontWeight: 900, color: "#ffd700", margin: "0 0 2px" }}>¡{sorted[0][1].nombre} gana!</h1>
-          <p className="fade-rise" style={{ color: "#7a7a7a", fontSize: 13, fontStyle: "italic", margin: 0 }}>La peor persona de la noche</p>
+          <p className="fade-rise" style={{ color: "#8a8a8a", fontSize: 13, fontStyle: "italic", margin: 0 }}>La peor persona de la noche</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 5, width: "100%" }}>
           {sorted.map(([u, j], i) => (
@@ -493,12 +490,12 @@ export default function Game({ sala, uid, codigo, onSalir }) {
               <span style={{ fontSize: 18, width: 28, textAlign: "center" }}>{i === 0 ? "👑" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}</span>
               <span style={{ flex: 1, fontSize: 15, fontWeight: 700, color: "#fff" }}>{j.nombre}</span>
               <span style={{ fontSize: 13, color: "#ffd700", fontWeight: 700 }}>{j.estrellas || 0} pts</span>
-              <span style={{ fontSize: 11, color: "#ff8800" }}>{j.segundosBebidos || 0}s🍺</span>
+              <span style={{ fontSize: 12, color: "#ff8800" }}>{j.segundosBebidos || 0}s🍺</span>
             </div>
           ))}
         </div>
         <div style={{ background: "#111", borderRadius: 12, padding: "14px 16px", border: "1px solid #222", width: "100%", boxSizing: "border-box" }}>
-          <p style={{ color: "#888", fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: "0 0 10px" }}>📊 ESTADÍSTICAS</p>
+          <p style={{ color: "#888", fontSize: 12, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: "0 0 10px" }}>📊 ESTADÍSTICAS</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             <div style={S.statRow}><span style={S.statL}>Rondas jugadas</span><span style={S.statV}>{sala.ronda}</span></div>
             {mvp && (mvp[1].votosTotales || 0) > 0 && <div style={S.statRow}><span style={S.statL}>Favorito del público</span><span style={S.statV}>{mvp[1].nombre} ({mvp[1].votosTotales} votos)</span></div>}
@@ -514,7 +511,7 @@ export default function Game({ sala, uid, codigo, onSalir }) {
         <button style={S.btnGold} disabled={cargandoRevancha} onClick={alJugarOtraVez}>
           {cargandoRevancha ? "Reiniciando…" : "🔁 Jugar otra vez"}
         </button>
-        <button style={S.btn} onClick={onSalir}>Salir a inicio</button>
+        <button style={S.btn} onClick={salirDelFin}>Salir a inicio</button>
       </div>
     );
   }

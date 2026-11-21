@@ -20,9 +20,9 @@ export default function ComoSeJuega({ storageKey, texto }) {
 
   return (
     <div style={{ background: "#1a1000", border: "1px solid #ffd700", borderRadius: 12, padding: "12px 14px", marginBottom: 20, width: "100%", maxWidth: 380, boxSizing: "border-box" }}>
-      <p style={{ color: "#ffd700", fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 6px" }}>📖 Cómo se juega</p>
+      <p style={{ color: "#ffd700", fontSize: 12, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 6px" }}>📖 Cómo se juega</p>
       <p style={{ color: "#fff", fontSize: 13, lineHeight: 1.5, margin: "0 0 10px" }}>{texto}</p>
-      <button style={{ background: "none", border: "none", color: "#7a7a7a", fontSize: 11, textDecoration: "underline", cursor: "pointer", padding: 0 }} onClick={cerrar}>
+      <button style={{ background: "none", border: "none", color: "#8a8a8a", fontSize: 13, textDecoration: "underline", cursor: "pointer", minHeight: 44, padding: "12px 10px" }} onClick={cerrar}>
         Entendido, no mostrar de nuevo
       </button>
     </div>
