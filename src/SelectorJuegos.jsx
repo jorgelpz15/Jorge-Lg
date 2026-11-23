@@ -108,17 +108,15 @@ export default function SelectorJuegos({ onElegir }) {
         <span key={copiado} className="fade-rise">{copiado ? "¡Link copiado! ✓" : "📤 Compartir esta app"}</span>
       </button>
       <div style={{ marginTop: 28, textAlign: "center" }}>
-        <p style={{ color: "#8a8a8a", fontSize: 12, margin: 0 }}>
-          Desarrollado por{" "}
-          {whatsapp ? (
-            <a href={whatsapp} target="_blank" rel="noreferrer" aria-label={`${MARCA_NOMBRE}, escribir por WhatsApp`}
-              style={{ display: "inline-block", padding: "14px 4px", color: "#ffd700", fontWeight: 800, textDecoration: "underline", textUnderlineOffset: 3 }}>
-              {MARCA_NOMBRE}
-            </a>
-          ) : (
-            <strong style={{ color: "#ffd700", fontWeight: 800 }}>{MARCA_NOMBRE}</strong>
-          )}
-        </p>
+        <p style={{ color: "#8a8a8a", fontSize: 12, margin: 0 }}>Desarrollado por</p>
+        {whatsapp ? (
+          <a href={whatsapp} target="_blank" rel="noreferrer" aria-label={`${MARCA_NOMBRE}, escribir por WhatsApp`}
+            style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 44, minHeight: 44, padding: "7px 8px" }}>
+            <img src="/fulmia-logo.svg" alt={MARCA_NOMBRE} height={30} style={{ display: "block", height: 30, width: "auto" }} />
+          </a>
+        ) : (
+          <img src="/fulmia-logo.svg" alt={MARCA_NOMBRE} height={30} style={{ display: "block", height: 30, width: "auto", margin: "8px auto 0" }} />
+        )}
       </div>
       <p style={{ color: "#8a8a8a", fontSize: 10, marginTop: 20 }}>v{__APP_VERSION__}</p>
     </div>
