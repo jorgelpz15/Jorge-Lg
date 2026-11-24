@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { S } from "./styles";
 import { MARCA_NOMBRE, linkWhatsApp } from "./marca";
+import LogoFulmia from "./LogoFulmia";
 
 const JUEGOS = [
   {
@@ -112,10 +113,10 @@ export default function SelectorJuegos({ onElegir }) {
         {whatsapp ? (
           <a href={whatsapp} target="_blank" rel="noreferrer" aria-label={`${MARCA_NOMBRE}, escribir por WhatsApp`}
             style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 44, minHeight: 44, padding: "7px 8px" }}>
-            <img src="/fulmia-logo.svg" alt={MARCA_NOMBRE} height={30} style={{ display: "block", height: 30, width: "auto" }} />
+            <LogoFulmia alto={30} />
           </a>
         ) : (
-          <img src="/fulmia-logo.svg" alt={MARCA_NOMBRE} height={30} style={{ display: "block", height: 30, width: "auto", margin: "8px auto 0" }} />
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}><LogoFulmia alto={30} /></div>
         )}
       </div>
       <p style={{ color: "#8a8a8a", fontSize: 10, marginTop: 20 }}>v{__APP_VERSION__}</p>
