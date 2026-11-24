@@ -2,6 +2,7 @@ import { useState } from "react";
 import { S } from "./styles";
 import { MARCA_NOMBRE, linkWhatsApp } from "./marca";
 import LogoFulmia from "./LogoFulmia";
+import { contarClicWhatsApp } from "./metricas";
 
 const JUEGOS = [
   {
@@ -111,7 +112,7 @@ export default function SelectorJuegos({ onElegir }) {
       <div style={{ marginTop: 28, textAlign: "center" }}>
         <p style={{ color: "#8a8a8a", fontSize: 12, margin: 0 }}>Desarrollado por</p>
         {whatsapp ? (
-          <a href={whatsapp} target="_blank" rel="noreferrer" aria-label={`${MARCA_NOMBRE}, escribir por WhatsApp`}
+          <a href={whatsapp} target="_blank" rel="noreferrer" onClick={contarClicWhatsApp} aria-label={`${MARCA_NOMBRE}, escribir por WhatsApp`}
             style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 44, minHeight: 44, padding: "7px 8px" }}>
             <LogoFulmia alto={30} />
           </a>

@@ -34,6 +34,14 @@ service cloud.firestore {
       allow get: if logueado() && codigoValido(codigo);
       allow create, update: if logueado() && codigoValido(codigo) && maxJugadores(12);
     }
+    // Contador anónimo de toques al enlace de WhatsApp del pie: solo se puede
+    // crear en 1 o sumar exactamente +1; no se puede leer, bajar ni borrar desde la app.
+    match /metricas/{id} {
+      allow create: if logueado() && id == 'whatsapp' && request.resource.data.keys().hasOnly(['clics'])
+        && request.resource.data.clics == 1;
+      allow update: if logueado() && id == 'whatsapp' && request.resource.data.keys().hasOnly(['clics'])
+        && request.resource.data.clics == resource.data.clics + 1;
+    }
     match /salasRocola/{codigo} {
       allow get: if logueado() && codigoValido(codigo);
       allow create, update: if logueado() && codigoValido(codigo) && maxJugadores(8);
