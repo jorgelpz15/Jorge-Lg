@@ -3,6 +3,7 @@
 // los dados y todos ven el mismo resultado al instante en su pantalla. No
 // hay rondas, ganador, ni fase "fin" — por eso tampoco tiene "jugar otra
 // vez" (no hace falta, la sala sigue viva para seguir tirando).
+import { contarSalaCreada } from "../metricas.js";
 import {
   doc, updateDoc, onSnapshot, runTransaction, serverTimestamp, deleteField, getDoc, setDoc,
 } from "firebase/firestore";
@@ -37,6 +38,7 @@ export async function crearSala(nombre, uid) {
     jugadores: { [uid]: jugadorNuevo(nombre) },
     numDados: NUM_DADOS_POR_DEFECTO, ultimoTiro: null,
   });
+  contarSalaCreada("dados");
   return codigo;
 }
 

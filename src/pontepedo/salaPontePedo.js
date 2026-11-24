@@ -3,6 +3,7 @@
 // ven la misma al instante. El mazo es un mazo real de 52 cartas + 2 jokers,
 // sin repetir hasta que se agota (igual que barajar un mazo físico) —
 // cuando se acaba, se vuelve a barajar el descarte.
+import { contarSalaCreada } from "../metricas.js";
 import {
   doc, getDoc, setDoc, updateDoc, onSnapshot, runTransaction, serverTimestamp, deleteField,
 } from "firebase/firestore";
@@ -76,6 +77,7 @@ export async function crearSala(nombre, uid) {
     jugadores: { [uid]: jugadorNuevo(nombre) },
     mazo: mazoNuevo(), descarte: [], cartaActual: null, reglaActiva: "",
   });
+  contarSalaCreada("pontepedo");
   return codigo;
 }
 

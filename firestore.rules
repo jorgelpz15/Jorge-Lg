@@ -12,6 +12,9 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function logueado() { return request.auth != null; }
     function codigoValido(c) { return c.matches('^[0-9]{4}$'); }
+    function idContador(id) {
+      return id in ['whatsapp', 'salas_cah', 'salas_rebanar', 'salas_semaforo', 'salas_dados', 'salas_pontepedo', 'salas_rocola'];
+    }
     function maxJugadores(n) { return request.resource.data.jugadores.size() <= n; }
 
     match /salas/{codigo} {
@@ -34,12 +37,12 @@ service cloud.firestore {
       allow get: if logueado() && codigoValido(codigo);
       allow create, update: if logueado() && codigoValido(codigo) && maxJugadores(12);
     }
-    // Contador anónimo de toques al enlace de WhatsApp del pie: solo se puede
-    // crear en 1 o sumar exactamente +1; no se puede leer, bajar ni borrar desde la app.
+    // Contadores anónimos (toques al enlace de WhatsApp y salas creadas por juego): solo se
+    // pueden crear en 1 o sumar exactamente +1; no se pueden leer, bajar ni borrar desde la app.
     match /metricas/{id} {
-      allow create: if logueado() && id == 'whatsapp' && request.resource.data.keys().hasOnly(['clics'])
+      allow create: if logueado() && idContador(id) && request.resource.data.keys().hasOnly(['clics'])
         && request.resource.data.clics == 1;
-      allow update: if logueado() && id == 'whatsapp' && request.resource.data.keys().hasOnly(['clics'])
+      allow update: if logueado() && idContador(id) && request.resource.data.keys().hasOnly(['clics'])
         && request.resource.data.clics == resource.data.clics + 1;
     }
     match /salasRocola/{codigo} {

@@ -14,6 +14,7 @@
 // instante. Puede haber pequeñas diferencias de milisegundos entre
 // celulares por la latencia normal de red (no es un cronómetro de
 // laboratorio, es un juego para jugar con amigos).
+import { contarSalaCreada } from "../metricas.js";
 import {
   doc, getDoc, setDoc, updateDoc, onSnapshot, runTransaction, serverTimestamp, deleteField,
 } from "firebase/firestore";
@@ -57,6 +58,7 @@ export async function crearSala(nombre, totalRondas, uid) {
     jugadores: { [uid]: jugadorNuevo(nombre) },
     orden: [], ronda: 0, horaInicio: null, demoraMs: 0, reacciones: {}, ultimaRonda: null, salaNueva: null,
   });
+  contarSalaCreada("semaforo");
   return codigo;
 }
 

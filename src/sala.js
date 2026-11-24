@@ -1,6 +1,7 @@
 // Toda la lógica de la sala multijugador: crear, unirse, jugar una ronda,
 // votar, repartir shots... Cada función escribe en Firestore y todos los
 // celulares conectados reciben el cambio vía onSnapshot (ver escucharSala).
+import { contarSalaCreada } from "./metricas.js";
 import {
   doc, getDoc, setDoc, updateDoc, onSnapshot, runTransaction, serverTimestamp, deleteField,
 } from "firebase/firestore";
@@ -53,6 +54,7 @@ export async function crearSala(nombre, shotsParaDesbloquear, uid, idioma) {
     salaNueva: null,
   };
   await setDoc(salaRef(codigo), sala);
+  contarSalaCreada("cah");
   return codigo;
 }
 

@@ -1,6 +1,7 @@
 // Lógica de sala para "A Rebanar". Usa el mismo proyecto de Firebase que
 // CAH pero una colección separada (salasRebanar) para no mezclar los
 // modelos de datos de los dos juegos.
+import { contarSalaCreada } from "../metricas.js";
 import {
   doc, getDoc, setDoc, updateDoc, onSnapshot, runTransaction, serverTimestamp, deleteField,
 } from "firebase/firestore";
@@ -43,6 +44,7 @@ export async function crearSala(nombre, dificultad, totalRondas, uid) {
     jugadores: { [uid]: jugadorNuevo(nombre) },
     orden: [], ronda: 0, figuraActual: null, cortes: {}, ultimaRonda: null, salaNueva: null,
   });
+  contarSalaCreada("rebanar");
   return codigo;
 }
 

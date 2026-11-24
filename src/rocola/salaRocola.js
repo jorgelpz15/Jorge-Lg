@@ -1,3 +1,4 @@
+import { contarSalaCreada } from "../metricas.js";
 import {
   doc, setDoc, onSnapshot, runTransaction, serverTimestamp,
 } from "firebase/firestore";
@@ -30,6 +31,7 @@ export async function crearSala(nombre, totalRondas, uid) {
     cancionActual: null, respuestas: {}, ultimaRonda: null,
     cancionesUsadas: [], salaNueva: null,
   });
+  contarSalaCreada("rocola");
   return codigo;
 }
 
