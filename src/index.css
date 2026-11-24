@@ -9,6 +9,31 @@ body {
   overscroll-behavior: none;
 }
 
+/* Línea de marca FulmIA Studio: pegada al borde superior (bajo la zona segura del iPhone), no tapa ni mueve nada. */
+body::before {
+  content: "";
+  position: fixed;
+  top: env(safe-area-inset-top, 0px);
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 9999;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(91,61,245,.15) 0%, #5B3DF5 25%, #FFC83D 50%, #5B3DF5 75%, rgba(91,61,245,.15) 100%);
+  background-size: 200% 100%;
+  animation: sweep 5s linear infinite;
+  box-shadow: 0 0 14px rgba(255,200,61,.35);
+}
+
+@keyframes sweep {
+  from { background-position: 0 0; }
+  to { background-position: 200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; }
+}
+
 input::placeholder {
   color: #7a7a7a;
 }

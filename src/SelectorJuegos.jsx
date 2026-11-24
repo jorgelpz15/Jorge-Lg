@@ -110,15 +110,15 @@ export default function SelectorJuegos({ onElegir }) {
         <span key={copiado} className="fade-rise">{copiado ? "¡Link copiado! ✓" : "📤 Compartir esta app"}</span>
       </button>
       <div style={{ marginTop: 28, textAlign: "center" }}>
-        <p style={{ color: "#8a8a8a", fontSize: 12, margin: 0 }}>Desarrollado por</p>
         {whatsapp ? (
-          <a href={whatsapp} target="_blank" rel="noreferrer" onClick={contarClicWhatsApp} aria-label={`${MARCA_NOMBRE}, escribir por WhatsApp`}
+          <a href={whatsapp} target="_blank" rel="noopener" onClick={contarClicWhatsApp} aria-label={`${MARCA_NOMBRE}, escribir por WhatsApp`}
             style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 44, minHeight: 44, padding: "7px 8px" }}>
-            <LogoFulmia alto={30} />
+            <LogoFulmia alto={36} />
           </a>
         ) : (
-          <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}><LogoFulmia alto={30} /></div>
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}><LogoFulmia alto={36} /></div>
         )}
+        <p style={{ color: "#8a8a8a", fontSize: 12, margin: "2px 0 0" }}>© 2026 FulmIA Studio</p>
       </div>
       <p style={{ color: "#8a8a8a", fontSize: 10, marginTop: 20 }}>v{__APP_VERSION__}</p>
     </div>
