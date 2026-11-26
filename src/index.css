@@ -9,25 +9,31 @@ body {
   overscroll-behavior: none;
 }
 
-/* Línea de marca FulmIA Studio: pegada al borde superior (bajo la zona segura del iPhone), no tapa ni mueve nada. */
+/* Línea de marca FulmIA Studio con los colores de esta página (oro, blanco, oro suave sobre negro).
+   Fija al borde superior, bajo la zona segura del iPhone; no tapa ni mueve nada. Sin desenfoque ni
+   transparencia de fondo: va en su propia capa para que su animación no repinte el texto de abajo. */
 body::before {
+  --fx-a: #FFD700;
+  --fx-b: #FFFFFF;
+  --fx-c: #FFF3A3;
   content: "";
   position: fixed;
   top: env(safe-area-inset-top, 0px);
   left: 0;
-  right: 0;
+  width: 200%;
   height: 2px;
   z-index: 9999;
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(91,61,245,.15) 0%, #5B3DF5 25%, #FFC83D 50%, #5B3DF5 75%, rgba(91,61,245,.15) 100%);
-  background-size: 200% 100%;
+  /* El degradado se repite dos veces y se desliza con transform (solo compositor): no repinta nada. */
+  background: linear-gradient(90deg, transparent 0%, var(--fx-a) 12.5%, var(--fx-b) 25%, var(--fx-c) 37.5%, transparent 50%,
+    var(--fx-a) 62.5%, var(--fx-b) 75%, var(--fx-c) 87.5%, transparent 100%);
   animation: sweep 5s linear infinite;
-  box-shadow: 0 0 14px rgba(255,200,61,.35);
+  box-shadow: 0 0 8px var(--fx-b);
 }
 
 @keyframes sweep {
-  from { background-position: 0 0; }
-  to { background-position: 200% 0; }
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 @media (prefers-reduced-motion: reduce) {
